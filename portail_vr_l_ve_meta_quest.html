@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portail Éducatif Meta Quest VR</title>
+    <title>Portail Éducatif Meta Quest VR - Élèves</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -66,11 +66,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .admin-badge { animation: pulse-border 2s infinite; }
-        @keyframes pulse-border {
-            0%, 100% { border-color: rgba(234, 179, 8, 0.6); }
-            50% { border-color: rgba(234, 179, 8, 0.2); }
-        }
     </style>
 </head>
 <body class="font-sans antialiased text-slate-100 min-h-screen flex flex-col pb-12 select-none">
@@ -84,14 +79,9 @@
                         <i class="fa-solid fa-vr-cardboard"></i>
                     </div>
                     <div>
-                        <div class="flex items-center gap-2">
-                            <h1 class="text-xl font-bold tracking-wide text-white">
-                                Espace <span class="text-gradient-cyan font-black">Élèves VR</span>
-                            </h1>
-                            <span id="adminModeIndicator" class="hidden text-xs bg-amber-500/20 border border-amber-500/50 text-amber-300 font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 admin-badge">
-                                <i class="fa-solid fa-user-shield text-xs"></i> Enseignant
-                            </span>
-                        </div>
+                        <h1 class="text-xl font-bold tracking-wide text-white">
+                            Espace <span class="text-gradient-cyan font-black">Élèves VR</span>
+                        </h1>
                         <p class="text-xs text-slate-400">Portail pédagogique Meta Quest</p>
                     </div>
                 </div>
@@ -117,21 +107,6 @@
                     <i class="fa-regular fa-clock text-cyan-400"></i>
                     <span class="clock-text">00:00</span>
                 </div>
-
-                <div id="adminActionButtons" class="hidden flex items-center gap-2">
-                    <button id="btnOpenAddModal" class="vr-btn bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 text-sm border border-cyan-300/30">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Ajouter un lien</span>
-                    </button>
-                    <button id="btnOpenAdminSettings" class="vr-btn bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3 py-2.5 rounded-xl text-sm font-medium" title="Paramètres & Clé API">
-                        <i class="fa-solid fa-gear"></i>
-                    </button>
-                </div>
-
-                <button id="btnAdminAuth" class="vr-btn bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-xl font-medium flex items-center gap-2 text-sm">
-                    <i id="btnAdminIcon" class="fa-solid fa-lock text-amber-400"></i>
-                    <span id="btnAdminText">Accès Enseignant</span>
-                </button>
             </div>
         </div>
     </header>
@@ -173,140 +148,21 @@
         </section>
     </main>
 
-    <!-- MODAL 1: AUTHENTICATION -->
-    <div id="pinModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
-        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-white/20 shadow-2xl relative text-center">
-            <h3 class="text-xl font-bold text-white mb-1">Espace Enseignant</h3>
-            <p class="text-xs text-slate-400 mb-6">Saisissez votre code PIN (Par défaut: <span class="font-mono text-cyan-300">1234</span>)</p>
-            <input type="password" maxlength="6" id="pinInput" readonly class="w-48 text-center text-2xl font-mono tracking-widest py-3 rounded-2xl bg-white/5 border border-white/20 text-amber-300 mx-auto mb-6">
-            <div class="grid grid-cols-3 gap-2 max-w-xs mx-auto mb-6">
-                <button class="pin-key vr-btn py-3 bg-white/5 border border-white/10 rounded-xl text-lg font-bold text-white">1</button>
-                <button class="pin-key vr-btn py-3 bg-white/5 border border-white/10 rounded-xl text-lg font-bold text-white">2</button>
-                <button class="pin-key vr-btn py-3 bg-white/5 border border-white/10 rounded-xl text-lg font-bold text-white">3</button>
-                <button class="pin-key vr-btn py-3 bg-white/5 border border-white/10 rounded-xl text-lg font-bold text-white">4</button>
-                <button class="pin-key vr-btn py-3 bg-white/5 border border-white/10 rounded-xl text-lg font-bold text-white">5</button>
-                <button class="pin-key vr-btn py-3 bg-white/5 border border-white/10 rounded-xl text-lg font-bold text-white">6</button>
-                <button class="pin-key vr-btn py-3 bg-white/5 border border-white/10 rounded-xl text-lg font-bold text-white">7</button>
-                <button class="pin-key vr-btn py-3 bg-white/5 border border-white/10 rounded-xl text-lg font-bold text-white">8</button>
-                <button class="pin-key vr-btn py-3 bg-white/5 border border-white/10 rounded-xl text-lg font-bold text-white">9</button>
-                <button id="pinClear" class="vr-btn py-3 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl text-sm font-bold">Effacer</button>
-                <button class="pin-key vr-btn py-3 bg-white/5 border border-white/10 rounded-xl text-lg font-bold text-white">0</button>
-                <button id="pinSubmit" class="vr-btn py-3 bg-amber-500 text-slate-950 rounded-xl text-sm font-bold">OK</button>
-            </div>
-            <button id="closePinModal" class="vr-btn text-xs text-slate-400 py-1">Annuler</button>
-        </div>
-    </div>
-
-    <!-- MODAL 2: ADD / EDIT BOOKMARK -->
-    <div id="bookmarkModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
-        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 border border-white/20 shadow-2xl relative">
-            <div class="flex justify-between items-center mb-6">
-                <h3 id="modalTitle" class="text-xl font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-bookmark text-cyan-400"></i>
-                    <span>Ajouter un lien éducatif</span>
-                </h3>
-                <button class="closeBookmarkModal vr-btn text-slate-400 hover:text-white p-2 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form id="bookmarkForm" class="space-y-4">
-                <input type="hidden" id="bookmarkId">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Titre *</label>
-                    <input type="text" id="inputTitle" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">URL *</label>
-                    <input type="url" id="inputUrl" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Matière</label>
-                        <select id="inputCategory" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/15 text-white"></select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Icône</label>
-                        <input type="text" id="inputIcon" placeholder="🚀" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Description</label>
-                    <textarea id="inputDescription" rows="2" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white resize-none"></textarea>
-                </div>
-                <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" class="closeBookmarkModal vr-btn px-5 py-2.5 rounded-xl bg-white/5 text-slate-300 text-sm">Annuler</button>
-                    <button type="submit" class="vr-btn px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-bold">Enregistrer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL 3: ADMIN SETTINGS -->
-    <div id="adminSettingsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
-        <div class="glass-panel w-full max-w-md rounded-3xl p-6 border border-white/20 shadow-2xl relative">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-amber-400"></i>
-                    <span>Paramètres Enseignant</span>
-                </h3>
-                <button class="closeAdminSettingsModal vr-btn text-slate-400 hover:text-white p-2 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-5">
-                <div>
-                    <label class="block text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1">Clé Maître Privée (X-Master-Key)</label>
-                    <p class="text-[11px] text-slate-400 mb-2">À renseigner une seule fois sur votre PC d'enseignant pour vous autoriser à modifier/ajouter des cours.</p>
-                    <div class="flex gap-2">
-                        <input type="password" id="apiKeyInput" placeholder="$2a$10$..." class="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm focus:outline-none focus:border-amber-400">
-                        <button id="btnSaveApiKey" class="vr-btn px-4 py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-sm">Sauvegarder</button>
-                    </div>
-                </div>
-
-                <hr class="border-white/10">
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Changer le Code PIN</label>
-                    <div class="flex gap-2">
-                        <input type="password" id="newPinInput" maxlength="6" placeholder="Nouveau PIN" class="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm font-mono">
-                        <button id="btnSaveNewPin" class="vr-btn px-4 py-2.5 bg-white/10 text-white font-bold rounded-xl text-sm">Modifier</button>
-                    </div>
-                </div>
-
-                <hr class="border-white/10">
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Ajouter une Matière</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="newCategoryInput" placeholder="Ex: Géographie..." class="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm">
-                        <button id="btnAddCategory" class="vr-btn px-4 py-2.5 bg-cyan-500 text-slate-950 font-bold rounded-xl text-sm">Créer</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOAST -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-panel px-5 py-3 rounded-2xl border border-cyan-500/40 text-white flex items-center gap-3 shadow-xl pointer-events-none">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-cyan-400 text-lg"></i>
-        <span id="toastMessage" class="text-sm font-medium">Message</span>
-    </div>
-
     <!-- SCRIPT APPLICATION -->
     <script>
-        const DEFAULT_PIN = "1234";
         const DEFAULT_CATEGORIES = ['Toutes', 'Sciences & Espace', 'Histoire & Musées', 'SVT & Anatomie', 'WebXR & Démo', 'Vidéos 360°'];
         const DEFAULT_BOOKMARKS = [
             { id: '1', title: 'NASA Solar System Treks', url: 'https://trek.nasa.gov', category: 'Sciences & Espace', icon: '🚀', description: 'Exploration interactive 3D des surfaces de la Lune, de Mars et du système solaire.' },
             { id: '2', title: 'Musée du Louvre VR', url: 'https://www.louvre.fr', category: 'Histoire & Musées', icon: '🏛️', description: 'Visites virtuelles immersives des galeries et expositions du musée.' }
         ];
 
-        // CONFIGURATION JSONBIN
+        // CONFIGURATION JSONBIN (Lecture seule publique)
         const binId = "6adb3157ac6210605a4b8388";
-        // Clé publique RESTREINTE EN LECTURE SEULE (Strictement aucun droit de modification/suppression)
         const readOnlyApiKey = "$2a$10$OdIm7EgO7Jnf3IUg8ukCuOIEkffYw7SErKxywlrM88lko/uP7ZtZ2";
 
         let categories = [];
         let bookmarks = [];
         let studentFavorites = [];
-        let currentPin = DEFAULT_PIN;
-        let isAdminLoggedIn = false;
         
         let currentCategory = 'Toutes';
         let searchQuery = '';
@@ -318,23 +174,6 @@
         const searchInput = document.getElementById('searchInput');
         const clearSearchBtn = document.getElementById('clearSearch');
         const favCountSpan = document.getElementById('favCount');
-        const adminModeIndicator = document.getElementById('adminModeIndicator');
-        const adminActionButtons = document.getElementById('adminActionButtons');
-        const btnAdminAuth = document.getElementById('btnAdminAuth');
-        const btnAdminIcon = document.getElementById('btnAdminIcon');
-        const btnAdminText = document.getElementById('btnAdminText');
-        const pinModal = document.getElementById('pinModal');
-        const pinInput = document.getElementById('pinInput');
-        const bookmarkModal = document.getElementById('bookmarkModal');
-        const adminSettingsModal = document.getElementById('adminSettingsModal');
-        const bookmarkForm = document.getElementById('bookmarkForm');
-        const modalTitle = document.getElementById('modalTitle');
-        const inputId = document.getElementById('bookmarkId');
-        const inputTitle = document.getElementById('inputTitle');
-        const inputUrl = document.getElementById('inputUrl');
-        const inputCategory = document.getElementById('inputCategory');
-        const inputIcon = document.getElementById('inputIcon');
-        const inputDescription = document.getElementById('inputDescription');
 
         window.addEventListener('DOMContentLoaded', async () => {
             await loadData();
@@ -343,7 +182,6 @@
             renderCategories();
             renderBookmarks();
             setupEventListeners();
-            setupPinKeypad();
         });
 
         function updateClock() {
@@ -353,10 +191,8 @@
 
         async function loadData() {
             studentFavorites = JSON.parse(localStorage.getItem('quest_edu_favs')) || [];
-            currentPin = localStorage.getItem('quest_edu_pin') || DEFAULT_PIN;
 
             try {
-                // Lecture autorisée via la clé d'accès Read-Only
                 const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
                     headers: { 'X-Access-Key': readOnlyApiKey }
                 });
@@ -367,40 +203,11 @@
                     updateFavCount();
                     return;
                 }
-            } catch (e) { console.error("Erreur Cloud, bascule local", e); }
+            } catch (e) { console.error("Erreur de chargement Cloud", e); }
 
-            categories = JSON.parse(localStorage.getItem('quest_edu_categories')) || [...DEFAULT_CATEGORIES];
-            bookmarks = JSON.parse(localStorage.getItem('quest_edu_bookmarks')) || [...DEFAULT_BOOKMARKS];
+            categories = [...DEFAULT_CATEGORIES];
+            bookmarks = [...DEFAULT_BOOKMARKS];
             updateFavCount();
-        }
-
-        async function saveData() {
-            localStorage.setItem('quest_edu_categories', JSON.stringify(categories));
-            localStorage.setItem('quest_edu_bookmarks', JSON.stringify(bookmarks));
-            localStorage.setItem('quest_edu_pin', currentPin);
-            updateFavCount();
-
-            // Récupère la Master Key enregistrée localement sur le PC de l'enseignant
-            const savedMasterKey = localStorage.getItem('quest_edu_master_key');
-
-            if (!savedMasterKey) {
-                showToast('Sauvegardé en local. Ajoutez votre X-Master-Key dans les paramètres pour mettre à jour le Cloud !', true);
-                return;
-            }
-
-            try {
-                const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': savedMasterKey
-                    },
-                    body: JSON.stringify({ categories, bookmarks })
-                });
-
-                if (response.ok) showToast('Synchronisé avec le Cloud !');
-                else showToast('Erreur : Master Key incorrecte', true);
-            } catch (e) { showToast('Erreur de connexion Cloud', true); }
         }
 
         function updateFavCount() { favCountSpan.textContent = studentFavorites.length; }
@@ -419,13 +226,6 @@
                     renderBookmarks();
                 });
                 categoryFilterContainer.appendChild(btn);
-            });
-
-            inputCategory.innerHTML = '';
-            categories.filter(c => c !== 'Toutes').forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat; opt.textContent = cat;
-                inputCategory.appendChild(opt);
             });
         }
 
@@ -449,11 +249,6 @@
                 let iconHTML = `<span class="text-2xl">${item.icon || '🌐'}</span>`;
                 if (item.icon && item.icon.startsWith('fa-')) iconHTML = `<i class="fa-brands ${item.icon} text-2xl text-cyan-400"></i>`;
 
-                const adminControls = isAdminLoggedIn ? `
-                    <button onclick="editBookmark('${item.id}')" class="vr-btn p-2.5 bg-white/5 hover:bg-white/15 text-slate-300 rounded-xl text-xs border border-white/10"><i class="fa-solid fa-pen"></i></button>
-                    <button onclick="deleteBookmark('${item.id}')" class="vr-btn p-2.5 bg-white/5 hover:bg-red-500/20 text-slate-300 rounded-xl text-xs border border-white/10"><i class="fa-solid fa-trash-can"></i></button>
-                ` : '';
-
                 card.innerHTML = `
                     <div>
                         <div class="flex items-start justify-between gap-3 mb-3">
@@ -468,7 +263,6 @@
                     </div>
                     <div class="flex items-center gap-2 pt-3 border-t border-white/5">
                         <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer" class="vr-btn flex-1 bg-cyan-500/20 text-cyan-300 font-bold py-2.5 px-4 rounded-xl text-center text-xs border border-cyan-500/30">Ouvrir en VR</a>
-                        ${adminControls}
                     </div>
                 `;
                 bookmarkGrid.appendChild(card);
@@ -482,103 +276,12 @@
             updateFavCount(); renderBookmarks();
         };
 
-        function setupPinKeypad() {
-            document.querySelectorAll('.pin-key').forEach(btn => {
-                btn.addEventListener('click', () => { if (pinInput.value.length < 6) pinInput.value += btn.textContent.trim(); });
-            });
-            document.getElementById('pinClear').addEventListener('click', () => pinInput.value = '');
-            document.getElementById('pinSubmit').addEventListener('click', () => {
-                if (pinInput.value === currentPin) { loginAdmin(); pinModal.classList.add('hidden'); pinInput.value = ''; }
-                else { showToast('PIN incorrect !', true); pinInput.value = ''; }
-            });
-        }
-
-        function loginAdmin() {
-            isAdminLoggedIn = true;
-            adminModeIndicator.classList.remove('hidden');
-            adminActionButtons.classList.remove('hidden');
-            btnAdminText.textContent = 'Quitter le Mode Édition';
-            renderBookmarks();
-        }
-
-        function logoutAdmin() {
-            isAdminLoggedIn = false;
-            adminModeIndicator.classList.add('hidden');
-            adminActionButtons.classList.add('hidden');
-            btnAdminText.textContent = 'Accès Enseignant';
-            renderBookmarks();
-        }
-
         function setupEventListeners() {
-            btnAdminAuth.addEventListener('click', () => { if (isAdminLoggedIn) logoutAdmin(); else { pinInput.value = ''; pinModal.classList.remove('hidden'); } });
-            document.getElementById('closePinModal').addEventListener('click', () => pinModal.classList.add('hidden'));
-
             searchInput.addEventListener('input', (e) => { searchQuery = e.target.value.trim(); renderBookmarks(); });
             document.getElementById('btnToggleFavoritesOnly').addEventListener('click', () => { showFavoritesOnly = !showFavoritesOnly; renderBookmarks(); });
-            document.getElementById('btnOpenAddModal').addEventListener('click', () => openBookmarkModal());
-            document.querySelectorAll('.closeBookmarkModal').forEach(btn => btn.addEventListener('click', () => bookmarkModal.classList.add('hidden')));
-            
-            document.getElementById('btnOpenAdminSettings').addEventListener('click', () => {
-                document.getElementById('apiKeyInput').value = localStorage.getItem('quest_edu_master_key') || '';
-                adminSettingsModal.classList.remove('hidden');
-            });
-            document.querySelectorAll('.closeAdminSettingsModal').forEach(btn => btn.addEventListener('click', () => adminSettingsModal.classList.add('hidden')));
-
-            // Sauvegarde de la Master Key d'écriture sur le PC Enseignant
-            document.getElementById('btnSaveApiKey').addEventListener('click', () => {
-                const masterKeyVal = document.getElementById('apiKeyInput').value.trim();
-                if (masterKeyVal) {
-                    localStorage.setItem('quest_edu_master_key', masterKeyVal);
-                    showToast('Master Key enregistrée sur votre navigateur !');
-                }
-            });
-
-            bookmarkForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const id = inputId.value || Date.now().toString();
-                const newBookmark = { id, title: inputTitle.value.trim(), url: inputUrl.value.trim(), category: inputCategory.value, icon: inputIcon.value.trim() || '🌐', description: inputDescription.value.trim() };
-                const idx = bookmarks.findIndex(b => b.id === id);
-                if (idx > -1) bookmarks[idx] = newBookmark; else bookmarks.unshift(newBookmark);
-                await saveData(); renderBookmarks(); bookmarkModal.classList.add('hidden');
-            });
-
-            document.getElementById('btnSaveNewPin').addEventListener('click', () => {
-                const newPin = document.getElementById('newPinInput').value.trim();
-                if (newPin.length >= 4) { currentPin = newPin; saveData(); showToast('PIN modifié !'); }
-            });
-
-            document.getElementById('btnAddCategory').addEventListener('click', async () => {
-                const catInput = document.getElementById('newCategoryInput');
-                if (catInput.value.trim() && !categories.includes(catInput.value.trim())) {
-                    categories.push(catInput.value.trim()); await saveData(); renderCategories(); catInput.value = '';
-                }
-            });
-        }
-
-        window.editBookmark = function(id) { const item = bookmarks.find(b => b.id === id); if (item) openBookmarkModal(item); };
-        window.deleteBookmark = async function(id) {
-            if (confirm('Supprimer ce lien ?')) { bookmarks = bookmarks.filter(b => b.id !== id); await saveData(); renderBookmarks(); }
-        };
-
-        function openBookmarkModal(item = null) {
-            if (item) {
-                modalTitle.querySelector('span').textContent = 'Éditer la ressource';
-                inputId.value = item.id; inputTitle.value = item.title; inputUrl.value = item.url; inputCategory.value = item.category; inputIcon.value = item.icon; inputDescription.value = item.description;
-            } else {
-                modalTitle.querySelector('span').textContent = 'Ajouter une ressource';
-                bookmarkForm.reset(); inputId.value = '';
-            }
-            bookmarkModal.classList.remove('hidden');
         }
 
         function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
-
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMessage').textContent = message;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3500);
-        }
     </script>
 </body>
 </html>
