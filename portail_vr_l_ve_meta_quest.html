@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail Éducatif Meta Quest VR</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        quest: {
+                            blue: '#0064e0',
+                            purple: '#7b2cbf',
+                            cyan: '#00f2fe',
+                            dark: '#080c14',
+                            panel: 'rgba(18, 24, 38, 0.75)',
+                            card: 'rgba(255, 255, 255, 0.05)',
+                            gold: '#fbbf24'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Spatial Computing Background & Aesthetics */
+        body {
+            background-color: #080c14;
+            background-image: 
+                radial-gradient(at 15% 15%, rgba(123, 44, 191, 0.22) 0px, transparent 55%),
+                radial-gradient(at 85% 20%, rgba(0, 100, 224, 0.22) 0px, transparent 55%),
+                radial-gradient(at 50% 85%, rgba(0, 242, 254, 0.15) 0px, transparent 55%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #f1f5f9;
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: rgba(18, 24, 38, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Hover, Focus, Laser Pointer Effects for Quest Controllers */
+        .glass-card:hover, .glass-card:focus-within {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(0, 242, 254, 0.5);
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 12px 30px -5px rgba(0, 242, 254, 0.3),
+                        0 0 20px 0 rgba(0, 242, 254, 0.15);
+        }
+
+        /* VR Friendly Button Interactions */
+        .vr-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .vr-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(8, 12, 20, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.5);
+        }
+
+        .text-gradient-cyan {
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-gradient-purple {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .admin-badge {
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(234, 179, 8, 0.6); }
+            50% { border-color: rgba(234, 179, 8, 0.2); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-slate-100 min-h-screen flex flex-col pb-12 select-none">
+
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-white/10 px-4 lg:px-8 py-3.5 mb-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- Logo & Portal Info -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white text-2xl font-black">
+                        <i class="fa-solid fa-vr-cardboard"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-xl font-bold tracking-wide text-white">
+                                Espace <span class="text-gradient-cyan font-black">Élèves VR</span>
+                            </h1>
+                            <span id="adminModeIndicator" class="hidden text-xs bg-amber-500/20 border border-amber-500/50 text-amber-300 font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 admin-badge">
+                                <i class="fa-solid fa-user-shield text-xs"></i> Enseignant
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400">Portail pédagogique Meta Quest</p>
+                    </div>
+                </div>
+
+                <!-- Clock Display for VR -->
+                <div id="vr-clock-mobile" class="text-xs font-mono bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-cyan-300 md:hidden flex items-center gap-1.5">
+                    <i class="fa-regular fa-clock"></i>
+                    <span class="clock-text">00:00</span>
+                </div>
+            </div>
+
+            <!-- Search Bar (Large target for VR laser) -->
+            <div class="relative w-full md:w-96">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 text-lg">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <input type="text" id="searchInput" 
+                    placeholder="Rechercher un cours, un site, une matière..." 
+                    class="w-full pl-12 pr-10 py-3 rounded-2xl bg-white/5 border border-white/15 text-white placeholder-slate-400 text-base focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition-all shadow-inner">
+                <button id="clearSearch" class="hidden absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Action Buttons / Admin Switch -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <div id="vr-clock-desktop" class="hidden md:flex text-xs font-mono bg-white/5 border border-white/10 px-3.5 py-2.5 rounded-xl text-cyan-300 items-center gap-2">
+                    <i class="fa-regular fa-clock text-cyan-400"></i>
+                    <span class="clock-text">00:00</span>
+                </div>
+
+                <!-- Admin Dynamic Buttons (Only visible when logged in) -->
+                <div id="adminActionButtons" class="hidden flex items-center gap-2">
+                    <button id="btnOpenAddModal" class="vr-btn bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 shadow-lg shadow-cyan-500/20 text-sm border border-cyan-300/30">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Ajouter un lien</span>
+                    </button>
+
+                    <button id="btnOpenAdminSettings" class="vr-btn bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3 py-2.5 rounded-xl text-sm font-medium" title="Paramètres & Données">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+                </div>
+
+                <!-- Login / Logout Admin Button -->
+                <button id="btnAdminAuth" class="vr-btn bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-white px-3.5 py-2.5 rounded-xl font-medium flex items-center gap-2 text-sm">
+                    <i id="btnAdminIcon" class="fa-solid fa-lock text-amber-400"></i>
+                    <span id="btnAdminText">Accès Enseignant</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 lg:px-8 flex-1 w-full">
+        
+        <!-- Welcome Banner for Students -->
+        <section class="glass-panel rounded-3xl p-6 mb-8 border border-white/10 relative overflow-hidden">
+            <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-gradient-to-br from-cyan-500/20 to-purple-600/20 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-300 text-2xl shrink-0">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Bienvenue dans votre espace d'apprentissage VR</h2>
+                        <p class="text-sm text-slate-300">Pointez une ressource avec votre manette et appuyez sur la gâchette pour l'ouvrir.</p>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats / Favoris Filter -->
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <button id="btnToggleFavoritesOnly" class="vr-btn flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-amber-400/50 text-slate-200 hover:text-amber-300 text-xs font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-star text-amber-400"></i>
+                        <span>Mes Favoris (<span id="favCount">0</span>)</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Filter Pills -->
+        <section class="mb-8 overflow-x-auto pb-2 scrollbar-none">
+            <div class="flex items-center gap-2 min-w-max" id="categoryFilterContainer">
+                <!-- Dynamically populated category buttons -->
+            </div>
+        </section>
+
+        <!-- Bookmarks Grid -->
+        <section>
+            <div id="bookmarkGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <!-- Bookmark cards injected here dynamically -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-center glass-panel rounded-3xl mt-4">
+                <div class="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-3xl text-slate-500 mb-4">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-1">Aucune ressource trouvée</h3>
+                <p class="text-slate-400 text-sm max-w-md mb-6">Aucun lien ne correspond à vos filtres ou à votre recherche.</p>
+                <button id="btnResetFilters" class="vr-btn px-5 py-2.5 bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 rounded-xl hover:bg-cyan-500/30 text-sm font-semibold">
+                    Réinitialiser les filtres
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL 1: PIN CODE AUTHENTICATION -->
+    <div id="pinModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 border border-white/20 shadow-2xl relative text-center">
+            
+            <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-user-lock"></i>
+            </div>
+
+            <h3 class="text-xl font-bold text-white mb-1">Espace Enseignant</h3>
+            <p class="text-xs text-slate-400 mb-6">Veuillez saisir votre code PIN de sécurité (Par défaut: <span class="font-mono text-cyan-300">1234</span>)</p>
+
+            <!-- PIN Display -->
+            <div class="flex justify-center gap-3 mb-6">
+                <input type="password" maxlength="6" id="pinInput" readonly class="w-48 text-center text-2xl font-mono tracking-widest py-3 rounded-2xl bg-white/5 border border-white/20 text-amber-300 focus:outline-none focus:border-amber-400">
+            </div>
+
+            <!-- On-Screen Keypad for Quest Laser Pointer -->
+            <div class="grid grid-cols-3 gap-2 max-w-xs mx-auto mb-6">
+                <button class="pin-key vr-btn py-3 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-lg font-bold text-white">1</button>
+                <button class="pin-key vr-btn py-3 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-lg font-bold text-white">2</button>
+                <button class="pin-key vr-btn py-3 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-lg font-bold text-white">3</button>
+                <button class="pin-key vr-btn py-3 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-lg font-bold text-white">4</button>
+                <button class="pin-key vr-btn py-3 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-lg font-bold text-white">5</button>
+                <button class="pin-key vr-btn py-3 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-lg font-bold text-white">6</button>
+                <button class="pin-key vr-btn py-3 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-lg font-bold text-white">7</button>
+                <button class="pin-key vr-btn py-3 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-lg font-bold text-white">8</button>
+                <button class="pin-key vr-btn py-3 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-lg font-bold text-white">9</button>
+                <button id="pinClear" class="vr-btn py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-sm font-bold">Effacer</button>
+                <button class="pin-key vr-btn py-3 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-lg font-bold text-white">0</button>
+                <button id="pinSubmit" class="vr-btn py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-sm font-bold">OK</button>
+            </div>
+
+            <button id="closePinModal" class="vr-btn text-xs text-slate-400 hover:text-white py-1">
+                Annuler
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ADD / EDIT BOOKMARK (ADMIN ONLY) -->
+    <div id="bookmarkModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 border border-white/20 shadow-2xl relative">
+            
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="modalTitle" class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-bookmark text-cyan-400"></i>
+                    <span>Ajouter un lien éducatif</span>
+                </h3>
+                <button class="closeBookmarkModal vr-btn text-slate-400 hover:text-white p-2 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="bookmarkForm" class="space-y-4">
+                <input type="hidden" id="bookmarkId">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Titre de la ressource *</label>
+                    <input type="text" id="inputTitle" required placeholder="Ex: Explorer Mars en 3D" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white focus:outline-none focus:border-cyan-400">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Adresse Web (URL) *</label>
+                    <input type="url" id="inputUrl" required placeholder="https://..." class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white focus:outline-none focus:border-cyan-400">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Matière / Catégorie</label>
+                        <select id="inputCategory" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/15 text-white focus:outline-none focus:border-cyan-400">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Icône (Emoji ou FontAwesome)</label>
+                        <input type="text" id="inputIcon" placeholder="🚀 ou fa-atom" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white focus:outline-none focus:border-cyan-400">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Description pédagogique</label>
+                    <textarea id="inputDescription" rows="2" placeholder="Courte explication pour les élèves..." class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white focus:outline-none focus:border-cyan-400 resize-none"></textarea>
+                </div>
+
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" class="closeBookmarkModal vr-btn px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-medium">
+                        Annuler
+                    </button>
+                    <button type="submit" class="vr-btn px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-bold shadow-lg shadow-cyan-500/20">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ADMIN SETTINGS (DATA & PIN MANAGEMENT) -->
+    <div id="adminSettingsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 border border-white/20 shadow-2xl relative">
+            
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-amber-400"></i>
+                    <span>Gestion Enseignant</span>
+                </h3>
+                <button class="closeAdminSettingsModal vr-btn text-slate-400 hover:text-white p-2 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Change PIN -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Changer le Code PIN Enseignant</label>
+                    <div class="flex gap-2">
+                        <input type="password" id="newPinInput" maxlength="6" placeholder="Nouveau PIN (ex: 5678)" class="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm font-mono focus:outline-none focus:border-amber-400">
+                        <button id="btnSaveNewPin" class="vr-btn px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm">
+                            Modifier
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="border-white/10">
+
+                <!-- Add Category -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Ajouter une Matière / Catégorie</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="newCategoryInput" placeholder="Ex: Géographie..." class="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm focus:outline-none focus:border-cyan-400">
+                        <button id="btnAddCategory" class="vr-btn px-4 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm">
+                            Créer
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="border-white/10">
+
+                <!-- Import / Export -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Sauvegarde & Transfert (Multi-Casques)</label>
+                    <p class="text-xs text-slate-400 mb-3">Exportez vos liens puis importez le fichier JSON sur les autres casques Meta Quest de la classe.</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="btnExportJSON" class="vr-btn px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/15 rounded-xl text-slate-200 text-xs font-semibold flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-download text-cyan-400 text-sm"></i> Exporter (JSON)
+                        </button>
+                        <label class="vr-btn px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/15 rounded-xl text-slate-200 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-upload text-purple-400 text-sm"></i> Importer
+                            <input type="file" id="importFileInput" accept=".json" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <hr class="border-white/10">
+
+                <!-- Reset Options -->
+                <div>
+                    <button id="btnResetDefault" class="w-full vr-btn px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-xl text-xs font-bold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Réinitialiser avec les cours par défaut
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-panel px-5 py-3 rounded-2xl border border-cyan-500/40 text-white flex items-center gap-3 shadow-xl pointer-events-none">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-cyan-400 text-lg"></i>
+        <span id="toastMessage" class="text-sm font-medium">Message</span>
+    </div>
+
+    <!-- APPLICATION JAVASCRIPT -->
+    <script>
+        // Initial Educational Default Data
+        const DEFAULT_PIN = "1234";
+
+        const DEFAULT_CATEGORIES = [
+            'Toutes',
+            'Sciences & Espace',
+            'Histoire & Musées',
+            'SVT & Anatomie',
+            'WebXR & Démo',
+            'Vidéos 360°'
+        ];
+
+        const DEFAULT_BOOKMARKS = [
+            {
+                id: '1',
+                title: 'NASA Solar System Treks',
+                url: 'https://trek.nasa.gov',
+                category: 'Sciences & Espace',
+                icon: '🚀',
+                description: 'Exploration interactive 3D des surfaces de la Lune, de Mars et du système solaire.'
+            },
+            {
+                id: '2',
+                title: 'Musée du Louvre VR',
+                url: 'https://www.louvre.fr/en-ce-moment/visites-en-ligne',
+                category: 'Histoire & Musées',
+                icon: '🏛️',
+                description: 'Visites virtuelles immersives des galeries et expositions du musée.'
+            },
+            {
+                id: '3',
+                title: 'BioDigital Human 3D',
+                url: 'https://human.biodigital.com',
+                category: 'SVT & Anatomie',
+                icon: '🧬',
+                description: 'Modèle interactif complet du corps humain, des organes et de la biologie.'
+            },
+            {
+                id: '4',
+                title: 'WebXR Samples Gallery',
+                url: 'https://immersive-web.github.io/webxr-samples/',
+                category: 'WebXR & Démo',
+                icon: '🥽',
+                description: 'Démonstrations officielles d\'expériences immersives directes au navigateur.'
+            },
+            {
+                id: '5',
+                title: 'Google Arts & Culture 360°',
+                url: 'https://artsandculture.google.com',
+                category: 'Histoire & Musées',
+                icon: '🎨',
+                description: 'Découvrez les œuvres d\'art, monuments et merveilles du monde en VR.'
+            },
+            {
+                id: '6',
+                title: 'YouTube VR 360',
+                url: 'https://www.youtube.com/feed/storefront?bp=ogU3NjA%3D',
+                category: 'Vidéos 360°',
+                icon: 'fa-youtube',
+                description: 'Documentaires, nature et voyages immersifs à 360 degrés.'
+            },
+            {
+                id: '7',
+                title: 'Sketchfab 3D Education',
+                url: 'https://sketchfab.com/categories/cultural-heritage-history',
+                category: 'Sciences & Espace',
+                icon: '🔍',
+                description: 'Banque d\'objets historiques et scientifiques numérisés en 3D.'
+            }
+        ];
+
+        // State variables
+        let categories = [];
+        let bookmarks = [];
+        let studentFavorites = [];
+        let currentPin = DEFAULT_PIN;
+        let isAdminLoggedIn = false;
+        
+        let currentCategory = 'Toutes';
+        let searchQuery = '';
+        let showFavoritesOnly = false;
+
+        // DOM Elements
+        const bookmarkGrid = document.getElementById('bookmarkGrid');
+        const emptyState = document.getElementById('emptyState');
+        const categoryFilterContainer = document.getElementById('categoryFilterContainer');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const favCountSpan = document.getElementById('favCount');
+        
+        // Admin UI Elements
+        const adminModeIndicator = document.getElementById('adminModeIndicator');
+        const adminActionButtons = document.getElementById('adminActionButtons');
+        const btnAdminAuth = document.getElementById('btnAdminAuth');
+        const btnAdminIcon = document.getElementById('btnAdminIcon');
+        const btnAdminText = document.getElementById('btnAdminText');
+
+        // Modal Elements
+        const pinModal = document.getElementById('pinModal');
+        const pinInput = document.getElementById('pinInput');
+        const bookmarkModal = document.getElementById('bookmarkModal');
+        const adminSettingsModal = document.getElementById('adminSettingsModal');
+        const bookmarkForm = document.getElementById('bookmarkForm');
+        
+        // Form Inputs
+        const modalTitle = document.getElementById('modalTitle');
+        const inputId = document.getElementById('bookmarkId');
+        const inputTitle = document.getElementById('inputTitle');
+        const inputUrl = document.getElementById('inputUrl');
+        const inputCategory = document.getElementById('inputCategory');
+        const inputIcon = document.getElementById('inputIcon');
+        const inputDescription = document.getElementById('inputDescription');
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+            updateClock();
+            setInterval(updateClock, 10000);
+            renderCategories();
+            renderBookmarks();
+            setupEventListeners();
+            setupPinKeypad();
+        });
+
+        // Clock Function
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.querySelectorAll('.clock-text').forEach(el => el.textContent = timeStr);
+        }
+
+        // Local Storage Sync
+        function loadFromLocalStorage() {
+            const savedCat = localStorage.getItem('quest_edu_categories');
+            const savedBook = localStorage.getItem('quest_edu_bookmarks');
+            const savedFavs = localStorage.getItem('quest_edu_favs');
+            const savedPin = localStorage.getItem('quest_edu_pin');
+
+            categories = savedCat ? JSON.parse(savedCat) : [...DEFAULT_CATEGORIES];
+            bookmarks = savedBook ? JSON.parse(savedBook) : [...DEFAULT_BOOKMARKS];
+            studentFavorites = savedFavs ? JSON.parse(savedFavs) : [];
+            currentPin = savedPin ? savedPin : DEFAULT_PIN;
+
+            updateFavCount();
+        }
+
+        function saveData() {
+            localStorage.setItem('quest_edu_categories', JSON.stringify(categories));
+            localStorage.setItem('quest_edu_bookmarks', JSON.stringify(bookmarks));
+            localStorage.setItem('quest_edu_favs', JSON.stringify(studentFavorites));
+            localStorage.setItem('quest_edu_pin', currentPin);
+            updateFavCount();
+        }
+
+        function updateFavCount() {
+            favCountSpan.textContent = studentFavorites.length;
+        }
+
+        // Render Category Pills
+        function renderCategories() {
+            categoryFilterContainer.innerHTML = '';
+            
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                const isActive = (cat === currentCategory) && !showFavoritesOnly;
+                
+                btn.className = `vr-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 border ${
+                    isActive 
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-cyan-300/40 shadow-lg shadow-cyan-500/20' 
+                    : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10 hover:border-white/20'
+                }`;
+                
+                btn.innerHTML = `<span>${cat}</span>`;
+                btn.addEventListener('click', () => {
+                    showFavoritesOnly = false;
+                    document.getElementById('btnToggleFavoritesOnly').classList.remove('border-amber-400', 'bg-amber-500/10');
+                    currentCategory = cat;
+                    renderCategories();
+                    renderBookmarks();
+                });
+
+                categoryFilterContainer.appendChild(btn);
+            });
+
+            // Fill Select in Modal
+            inputCategory.innerHTML = '';
+            categories.filter(c => c !== 'Toutes').forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                inputCategory.appendChild(opt);
+            });
+        }
+
+        // Render Bookmarks Grid
+        function renderBookmarks() {
+            bookmarkGrid.innerHTML = '';
+
+            const filtered = bookmarks.filter(item => {
+                const isFav = studentFavorites.includes(item.id);
+                if (showFavoritesOnly && !isFav) return false;
+
+                const matchesCategory = currentCategory === 'Toutes' || item.category === currentCategory;
+                const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      item.category.toLowerCase().includes(searchQuery.toLowerCase());
+                
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+            }
+
+            filtered.forEach(item => {
+                const isFavorite = studentFavorites.includes(item.id);
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-3xl p-5 flex flex-col justify-between relative group';
+                
+                // Icon format check
+                let iconHTML = `<span class="text-2xl">${item.icon || '🌐'}</span>`;
+                if (item.icon && item.icon.startsWith('fa-')) {
+                    iconHTML = `<i class="fa-brands ${item.icon} text-2xl text-cyan-400"></i>`;
+                }
+
+                // Admin Action Buttons HTML (Hidden for Students)
+                const adminControlsHTML = isAdminLoggedIn ? `
+                    <button onclick="editBookmark('${item.id}')" class="vr-btn p-2.5 bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white rounded-xl text-xs border border-white/10" title="Éditer">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button onclick="deleteBookmark('${item.id}')" class="vr-btn p-2.5 bg-white/5 hover:bg-red-500/20 text-slate-300 hover:text-red-400 rounded-xl text-xs border border-white/10" title="Supprimer">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                ` : '';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
+                                ${iconHTML}
+                            </div>
+                            
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="toggleFavorite('${item.id}')" class="vr-btn p-2 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 ${isFavorite ? 'text-amber-400' : 'text-slate-500 hover:text-slate-300'}" title="Ajouter aux favoris">
+                                    <i class="${isFavorite ? 'fa-solid' : 'fa-regular'} fa-star text-sm"></i>
+                                </button>
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300">
+                                    ${escapeHTML(item.category)}
+                                </span>
+                            </div>
+                        </div>
+
+                        <h3 class="text-base font-bold text-white mb-1.5 line-clamp-1 group-hover:text-cyan-300 transition-colors">
+                            ${escapeHTML(item.title)}
+                        </h3>
+                        
+                        <p class="text-slate-400 text-xs leading-relaxed line-clamp-2 mb-4">
+                            ${escapeHTML(item.description || 'Aucune description.')}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-3 border-t border-white/5">
+                        <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer" 
+                           class="vr-btn flex-1 bg-gradient-to-r from-cyan-500/20 to-blue-600/20 hover:from-cyan-500 hover:to-blue-600 text-cyan-300 hover:text-white font-bold py-2.5 px-4 rounded-xl text-center text-xs transition-all flex items-center justify-center gap-2 border border-cyan-500/30">
+                            <span>Ouvrir en VR</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                        </a>
+
+                        ${adminControlsHTML}
+                    </div>
+                `;
+
+                bookmarkGrid.appendChild(card);
+            });
+        }
+
+        // Toggle Favorites (Student side)
+        window.toggleFavorite = function(id) {
+            if (studentFavorites.includes(id)) {
+                studentFavorites = studentFavorites.filter(favId => favId !== id);
+                showToast('Retiré des favoris');
+            } else {
+                studentFavorites.push(id);
+                showToast('Ajouté aux favoris !');
+            }
+            saveData();
+            renderBookmarks();
+        };
+
+        // Pin Modal Keypad Setup
+        function setupPinKeypad() {
+            document.querySelectorAll('.pin-key').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (pinInput.value.length < 6) {
+                        pinInput.value += btn.textContent.trim();
+                    }
+                });
+            });
+
+            document.getElementById('pinClear').addEventListener('click', () => {
+                pinInput.value = '';
+            });
+
+            document.getElementById('pinSubmit').addEventListener('click', () => {
+                if (pinInput.value === currentPin) {
+                    loginAdmin();
+                    pinModal.classList.add('hidden');
+                    pinInput.value = '';
+                } else {
+                    showToast('Code PIN incorrect !', true);
+                    pinInput.value = '';
+                }
+            });
+        }
+
+        // Admin Auth Login/Logout
+        function loginAdmin() {
+            isAdminLoggedIn = true;
+            adminModeIndicator.classList.remove('hidden');
+            adminActionButtons.classList.remove('hidden');
+            btnAdminIcon.className = 'fa-solid fa-right-from-bracket text-red-400';
+            btnAdminText.textContent = 'Quitter le Mode Édition';
+            btnAdminAuth.classList.add('border-amber-500/50', 'bg-amber-500/10');
+            renderBookmarks();
+            showToast('Mode Enseignant activé');
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            adminModeIndicator.classList.add('hidden');
+            adminActionButtons.classList.add('hidden');
+            btnAdminIcon.className = 'fa-solid fa-lock text-amber-400';
+            btnAdminText.textContent = 'Accès Enseignant';
+            btnAdminAuth.classList.remove('border-amber-500/50', 'bg-amber-500/10');
+            renderBookmarks();
+            showToast('Mode Élève réactivé');
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Admin Auth Button
+            btnAdminAuth.addEventListener('click', () => {
+                if (isAdminLoggedIn) {
+                    logoutAdmin();
+                } else {
+                    pinInput.value = '';
+                    pinModal.classList.remove('hidden');
+                }
+            });
+
+            document.getElementById('closePinModal').addEventListener('click', () => {
+                pinModal.classList.add('hidden');
+            });
+
+            // Search Filter
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value.trim();
+                clearSearchBtn.classList.toggle('hidden', searchQuery === '');
+                renderBookmarks();
+            });
+
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                searchQuery = '';
+                clearSearchBtn.classList.add('hidden');
+                renderBookmarks();
+            });
+
+            // Favorites Filter Toggle
+            document.getElementById('btnToggleFavoritesOnly').addEventListener('click', (e) => {
+                showFavoritesOnly = !showFavoritesOnly;
+                const btn = document.getElementById('btnToggleFavoritesOnly');
+                if (showFavoritesOnly) {
+                    btn.classList.add('border-amber-400', 'bg-amber-500/10');
+                } else {
+                    btn.classList.remove('border-amber-400', 'bg-amber-500/10');
+                }
+                renderBookmarks();
+            });
+
+            document.getElementById('btnResetFilters').addEventListener('click', () => {
+                currentCategory = 'Toutes';
+                showFavoritesOnly = false;
+                searchInput.value = '';
+                searchQuery = '';
+                clearSearchBtn.classList.add('hidden');
+                document.getElementById('btnToggleFavoritesOnly').classList.remove('border-amber-400', 'bg-amber-500/10');
+                renderCategories();
+                renderBookmarks();
+            });
+
+            // Modal Openers & Closers
+            document.getElementById('btnOpenAddModal').addEventListener('click', () => {
+                openBookmarkModal();
+            });
+
+            document.querySelectorAll('.closeBookmarkModal').forEach(btn => {
+                btn.addEventListener('click', () => bookmarkModal.classList.add('hidden'));
+            });
+
+            document.getElementById('btnOpenAdminSettings').addEventListener('click', () => {
+                adminSettingsModal.classList.remove('hidden');
+            });
+
+            document.querySelectorAll('.closeAdminSettingsModal').forEach(btn => {
+                btn.addEventListener('click', () => adminSettingsModal.classList.add('hidden'));
+            });
+
+            // Form Submit (Add/Edit)
+            bookmarkForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const id = inputId.value || Date.now().toString();
+                const newBookmark = {
+                    id: id,
+                    title: inputTitle.value.trim(),
+                    url: inputUrl.value.trim(),
+                    category: inputCategory.value,
+                    icon: inputIcon.value.trim() || '🌐',
+                    description: inputDescription.value.trim()
+                };
+
+                const existingIndex = bookmarks.findIndex(b => b.id === id);
+                if (existingIndex > -1) {
+                    bookmarks[existingIndex] = newBookmark;
+                    showToast('Lien mis à jour !');
+                } else {
+                    bookmarks.unshift(newBookmark);
+                    showToast('Nouveau lien ajouté !');
+                }
+
+                saveData();
+                renderBookmarks();
+                bookmarkModal.classList.add('hidden');
+            });
+
+            // Change PIN Code
+            document.getElementById('btnSaveNewPin').addEventListener('click', () => {
+                const newPin = document.getElementById('newPinInput').value.trim();
+                if (newPin.length >= 4) {
+                    currentPin = newPin;
+                    saveData();
+                    document.getElementById('newPinInput').value = '';
+                    showToast('Code PIN modifié avec succès !');
+                } else {
+                    showToast('Le PIN doit faire au moins 4 chiffres.', true);
+                }
+            });
+
+            // Add Category
+            document.getElementById('btnAddCategory').addEventListener('click', () => {
+                const catInput = document.getElementById('newCategoryInput');
+                const catName = catInput.value.trim();
+
+                if (catName && !categories.includes(catName)) {
+                    categories.push(catName);
+                    saveData();
+                    renderCategories();
+                    catInput.value = '';
+                    showToast(`Matière "${catName}" ajoutée !`);
+                }
+            });
+
+            // Export JSON Configuration
+            document.getElementById('btnExportJSON').addEventListener('click', () => {
+                const data = {
+                    categories: categories,
+                    bookmarks: bookmarks,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `meta-quest-cour-vr-${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Fichier de configuration exporté !');
+            });
+
+            // Import JSON Configuration
+            document.getElementById('importFileInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        if (imported.categories && imported.bookmarks) {
+                            categories = imported.categories;
+                            bookmarks = imported.bookmarks;
+                            saveData();
+                            renderCategories();
+                            renderBookmarks();
+                            adminSettingsModal.classList.add('hidden');
+                            showToast('Configuration importée avec succès !');
+                        } else {
+                            showToast('Format JSON invalide.', true);
+                        }
+                    } catch (err) {
+                        showToast('Erreur lors de l\'importation.', true);
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // Reset Default Data
+            document.getElementById('btnResetDefault').addEventListener('click', () => {
+                if (confirm('Voulez-vous réinitialiser tous les liens avec la configuration par défaut ?')) {
+                    categories = [...DEFAULT_CATEGORIES];
+                    bookmarks = [...DEFAULT_BOOKMARKS];
+                    saveData();
+                    renderCategories();
+                    renderBookmarks();
+                    adminSettingsModal.classList.add('hidden');
+                    showToast('Données réinitialisées !');
+                }
+            });
+        }
+
+        // Global functions for inline Edit & Delete (Admin)
+        window.editBookmark = function(id) {
+            const item = bookmarks.find(b => b.id === id);
+            if (item) {
+                openBookmarkModal(item);
+            }
+        };
+
+        window.deleteBookmark = function(id) {
+            if (confirm('Supprimer ce lien pour la classe ?')) {
+                bookmarks = bookmarks.filter(b => b.id !== id);
+                saveData();
+                renderBookmarks();
+                showToast('Lien supprimé.');
+            }
+        };
+
+        function openBookmarkModal(item = null) {
+            if (item) {
+                modalTitle.querySelector('span').textContent = 'Éditer la ressource';
+                inputId.value = item.id;
+                inputTitle.value = item.title;
+                inputUrl.value = item.url;
+                inputCategory.value = item.category;
+                inputIcon.value = item.icon;
+                inputDescription.value = item.description;
+            } else {
+                modalTitle.querySelector('span').textContent = 'Ajouter une ressource';
+                bookmarkForm.reset();
+                inputId.value = '';
+                if (currentCategory !== 'Toutes') {
+                    inputCategory.value = currentCategory;
+                }
+            }
+            bookmarkModal.classList.remove('hidden');
+        }
+
+        // Helper: Escape HTML
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // Toast Notifications
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+            
+            toastMessage.textContent = message;
+            if (isError) {
+                toastIcon.className = 'fa-solid fa-circle-exclamation text-red-400 text-lg';
+                toast.classList.replace('border-cyan-500/40', 'border-red-500/40');
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-check text-cyan-400 text-lg';
+                toast.classList.replace('border-red-500/40', 'border-cyan-500/40');
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
