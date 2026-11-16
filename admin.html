@@ -51,6 +51,10 @@
             backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: grab;
+        }
+        .glass-card:active {
+            cursor: grabbing;
         }
         .glass-card:hover {
             background: rgba(255, 255, 255, 0.09);
@@ -102,7 +106,7 @@
                     </div>
                     <div>
                         <h2 class="text-base font-bold text-white">Centre de contrôle Cloud</h2>
-                        <p class="text-xs text-slate-400">Vos modifications sont synchronisées en direct sur les casques Meta Quest.</p>
+                        <p class="text-xs text-slate-400">Glissez-déposez les cartes pour réorganiser l'ordre d'affichage. Vos modifications sont synchronisées en direct.</p>
                     </div>
                 </div>
                 <a href="index.html" target="_blank" class="vr-btn text-xs bg-white/5 hover:bg-white/10 border border-white/15 text-cyan-300 px-4 py-2.5 rounded-xl flex items-center gap-2 font-medium">
@@ -127,7 +131,6 @@
             <p class="text-xs text-slate-400 text-center mb-6">Entrez votre Clé API Maître (X-Master-Key) pour accéder au panneau d'administration.</p>
             
             <form id="authForm" class="space-y-4">
-                <!-- Champ Master Key avec bouton voir -->
                 <div>
                     <label class="block text-xs font-semibold text-amber-400 uppercase mb-1">Clé API Maître (X-Master-Key)</label>
                     <div class="relative">
@@ -221,6 +224,7 @@
         let categories = [];
         let bookmarks = [];
         let masterKey = "";
+        let draggedIndex = null;
 
         const authModal = document.getElementById('authModal');
         const authForm = document.getElementById('authForm');
@@ -304,7 +308,7 @@
                     body: JSON.stringify({ categories, bookmarks })
                 });
 
-                if (response.ok) showToast('Modifications enregistrées sur le Cloud !');
+                if (response.ok) showToast('Ordre et modifications enregistrés sur le Cloud !');
                 else showToast('Erreur lors de la sauvegarde Cloud', true);
             } catch (e) { showToast('Erreur réseau Cloud', true); }
         }
@@ -320,16 +324,32 @@
 
         function renderBookmarks() {
             bookmarkGrid.innerHTML = '';
-            bookmarks.forEach(item => {
+            bookmarks.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = 'glass-card rounded-3xl p-5 flex flex-col justify-between relative';
+                card.setAttribute('draggable', 'true');
+                card.dataset.index = index;
+
+                // Événements de Drag and Drop
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('dragenter', handleDragEnter);
+                card.addEventListener('dragleave', handleDragLeave);
+                card.addEventListener('drop', handleDrop);
+                card.addEventListener('dragend', handleDragEnd);
+
                 let iconHTML = `<span class="text-2xl">${item.icon || '🌐'}</span>`;
                 if (item.icon && item.icon.startsWith('fa-')) iconHTML = `<i class="fa-brands ${item.icon} text-2xl text-amber-400"></i>`;
 
                 card.innerHTML = `
                     <div>
                         <div class="flex items-start justify-between gap-3 mb-3">
-                            <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">${iconHTML}</div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">${iconHTML}</div>
+                                <div class="text-slate-500 hover:text-amber-400 cursor-grab p-1" title="Glisser pour réorganiser">
+                                    <i class="fa-solid fa-grip-vertical"></i>
+                                </div>
+                            </div>
                             <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300">${escapeHTML(item.category)}</span>
                         </div>
                         <h3 class="text-base font-bold text-white mb-1.5 line-clamp-1">${escapeHTML(item.title)}</h3>
@@ -345,6 +365,51 @@
                     </div>
                 `;
                 bookmarkGrid.appendChild(card);
+            });
+        }
+
+        // --- GESTIONNAIRES DRAG & DROP ---
+        function handleDragStart(e) {
+            draggedIndex = parseInt(this.dataset.index);
+            e.dataTransfer.effectAllowed = 'move';
+            this.classList.add('opacity-40', 'border-amber-400');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDragEnter(e) {
+            this.classList.add('border-amber-400', 'scale-[1.01]');
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('border-amber-400', 'scale-[1.01]');
+        }
+
+        async function handleDrop(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            this.classList.remove('border-amber-400', 'scale-[1.01]');
+
+            const targetIndex = parseInt(this.dataset.index);
+            if (draggedIndex !== null && draggedIndex !== targetIndex) {
+                // Réorganisation du tableau bookmarks
+                const movedItem = bookmarks.splice(draggedIndex, 1)[0];
+                bookmarks.splice(targetIndex, 0, movedItem);
+
+                renderBookmarks();
+                await saveData(); // Sauvegarde automatique du nouvel ordre
+            }
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('opacity-40', 'border-amber-400');
+            document.querySelectorAll('#bookmarkGrid > div').forEach(card => {
+                card.classList.remove('border-amber-400', 'scale-[1.01]');
             });
         }
 
@@ -402,7 +467,7 @@
         function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
 
         function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
+            The toast = document.getElementById('toast');
             document.getElementById('toastMessage').textContent = message;
             toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3500);
