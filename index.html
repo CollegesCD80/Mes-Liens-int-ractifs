@@ -138,9 +138,9 @@
             <div class="flex items-center gap-2 min-w-max" id="categoryFilterContainer"></div>
         </section>
 
-        <!-- BOOKMARKS GRID (8 par ligne sur grands écrans) -->
+        <!-- BOOKMARKS GRID (6 par ligne sur grands écrans) -->
         <section>
-            <div id="bookmarkGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-8 gap-4"></div>
+            <div id="bookmarkGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4"></div>
             <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-center glass-panel rounded-3xl mt-4">
                 <h3 class="text-xl font-bold text-white mb-1">Aucune ressource trouvée</h3>
                 <button id="btnResetFilters" class="vr-btn mt-4 px-5 py-2.5 bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 rounded-xl text-sm font-semibold">
@@ -217,16 +217,19 @@
         function renderCategories() {
             categoryFilterContainer.innerHTML = '';
             
-            // Tri alphabétique des catégories (en gardant 'Toutes' en premier)
             if (!categories.includes('Toutes')) categories.unshift('Toutes');
             const otherCategories = categories.filter(c => c !== 'Toutes').sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
             const sortedCategories = ['Toutes', ...otherCategories];
+
+            if (!sortedCategories.includes(currentCategory)) {
+                currentCategory = 'Toutes';
+            }
 
             sortedCategories.forEach(cat => {
                 const btn = document.createElement('button');
                 const isActive = (cat === currentCategory) && !showFavoritesOnly;
                 btn.className = `vr-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all border ${isActive ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-cyan-300/40 shadow-lg' : 'bg-white/5 text-slate-300 border-white/10'}`;
-                btn.innerHTML = `<span>${cat}</span>`;
+                btn.innerHTML = `<span>${escapeHTML(cat)}</span>`;
                 btn.addEventListener('click', () => {
                     showFavoritesOnly = false;
                     currentCategory = cat;
@@ -254,23 +257,23 @@
                 const isFavorite = studentFavorites.includes(item.id);
                 const card = document.createElement('div');
                 card.className = 'glass-card rounded-3xl p-4 flex flex-col justify-between relative';
-                let iconHTML = `<span class="text-xl">${item.icon || '🌐'}</span>`;
-                if (item.icon && item.icon.startsWith('fa-')) iconHTML = `<i class="fa-brands ${item.icon} text-xl text-cyan-400"></i>`;
+                let iconHTML = `<span class="text-2xl">${item.icon || '🌐'}</span>`;
+                if (item.icon && item.icon.startsWith('fa-')) iconHTML = `<i class="fa-brands ${item.icon} text-2xl text-cyan-400"></i>`;
 
                 card.innerHTML = `
                     <div>
-                        <div class="flex items-start justify-between gap-2 mb-2">
-                            <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center shrink-0">${iconHTML}</div>
-                            <div class="flex items-center gap-1">
-                                <button onclick="toggleFavorite('${item.id}')" class="vr-btn p-1.5 rounded-lg bg-white/5 border border-white/10 ${isFavorite ? 'text-amber-400' : 'text-slate-500'}"><i class="${isFavorite ? 'fa-solid' : 'fa-regular'} fa-star text-xs"></i></button>
-                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 truncate max-w-[80px]">${escapeHTML(item.category)}</span>
+                        <div class="flex items-start justify-between gap-2 mb-3">
+                            <div class="w-11 h-11 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center shrink-0">${iconHTML}</div>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="toggleFavorite('${item.id}')" class="vr-btn p-2 rounded-xl bg-white/5 border border-white/10 ${isFavorite ? 'text-amber-400' : 'text-slate-500'}"><i class="${isFavorite ? 'fa-solid' : 'fa-regular'} fa-star text-xs"></i></button>
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 line-clamp-2 leading-tight text-right">${escapeHTML(item.category)}</span>
                             </div>
                         </div>
-                        <h3 class="text-sm font-bold text-white mb-1 line-clamp-2 leading-snug min-h-[2.5rem]" title="${escapeHTML(item.title)}">${escapeHTML(item.title)}</h3>
-                        <p class="text-slate-400 text-[11px] leading-relaxed line-clamp-2 mb-3">${escapeHTML(item.description || '')}</p>
+                        <h3 class="text-sm font-bold text-white text-center mb-1.5 line-clamp-2 leading-snug min-h-[2.5rem]" title="${escapeHTML(item.title)}">${escapeHTML(item.title)}</h3>
+                        <p class="text-slate-400 text-[11px] text-center leading-relaxed line-clamp-2 mb-3">${escapeHTML(item.description || '')}</p>
                     </div>
-                    <div class="flex items-center gap-2 pt-2 border-t border-white/5">
-                        <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer" class="vr-btn flex-1 bg-cyan-500/20 text-cyan-300 font-bold py-2 px-3 rounded-lg text-center text-[11px] border border-cyan-500/30">Ouvrir en VR</a>
+                    <div class="flex items-center gap-2 pt-2.5 border-t border-white/5">
+                        <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer" class="vr-btn flex-1 bg-cyan-500/20 text-cyan-300 font-bold py-2 px-3 rounded-lg text-center text-xs border border-cyan-500/30">Ouvrir en VR</a>
                     </div>
                 `;
                 bookmarkGrid.appendChild(card);
