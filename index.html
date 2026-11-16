@@ -72,7 +72,7 @@
 
     <!-- TOP HEADER -->
     <header class="sticky top-0 z-40 glass-panel border-b border-white/10 px-4 lg:px-8 py-3.5 mb-6">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="max-w-[95rem] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center shadow-lg text-white text-2xl font-black">
@@ -112,7 +112,7 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="max-w-7xl mx-auto px-4 lg:px-8 flex-1 w-full">
+    <main class="max-w-[95rem] mx-auto px-4 lg:px-8 flex-1 w-full">
         <section class="glass-panel rounded-3xl p-6 mb-8 border border-white/10 relative overflow-hidden">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
                 <div class="flex items-center gap-4">
@@ -133,12 +133,14 @@
             </div>
         </section>
 
+        <!-- BARRE HORIZONTALE DES CATÉGORIES -->
         <section class="mb-8 overflow-x-auto pb-2">
             <div class="flex items-center gap-2 min-w-max" id="categoryFilterContainer"></div>
         </section>
 
+        <!-- BOOKMARKS GRID (8 par ligne sur grands écrans) -->
         <section>
-            <div id="bookmarkGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+            <div id="bookmarkGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-8 gap-4"></div>
             <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-center glass-panel rounded-3xl mt-4">
                 <h3 class="text-xl font-bold text-white mb-1">Aucune ressource trouvée</h3>
                 <button id="btnResetFilters" class="vr-btn mt-4 px-5 py-2.5 bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 rounded-xl text-sm font-semibold">
@@ -214,10 +216,16 @@
 
         function renderCategories() {
             categoryFilterContainer.innerHTML = '';
-            categories.forEach(cat => {
+            
+            // Tri alphabétique des catégories (en gardant 'Toutes' en premier)
+            if (!categories.includes('Toutes')) categories.unshift('Toutes');
+            const otherCategories = categories.filter(c => c !== 'Toutes').sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+            const sortedCategories = ['Toutes', ...otherCategories];
+
+            sortedCategories.forEach(cat => {
                 const btn = document.createElement('button');
                 const isActive = (cat === currentCategory) && !showFavoritesOnly;
-                btn.className = `vr-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all border ${isActive ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-cyan-300/40' : 'bg-white/5 text-slate-300 border-white/10'}`;
+                btn.className = `vr-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all border ${isActive ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-cyan-300/40 shadow-lg' : 'bg-white/5 text-slate-300 border-white/10'}`;
                 btn.innerHTML = `<span>${cat}</span>`;
                 btn.addEventListener('click', () => {
                     showFavoritesOnly = false;
@@ -245,24 +253,24 @@
             filtered.forEach(item => {
                 const isFavorite = studentFavorites.includes(item.id);
                 const card = document.createElement('div');
-                card.className = 'glass-card rounded-3xl p-5 flex flex-col justify-between relative';
-                let iconHTML = `<span class="text-2xl">${item.icon || '🌐'}</span>`;
-                if (item.icon && item.icon.startsWith('fa-')) iconHTML = `<i class="fa-brands ${item.icon} text-2xl text-cyan-400"></i>`;
+                card.className = 'glass-card rounded-3xl p-4 flex flex-col justify-between relative';
+                let iconHTML = `<span class="text-xl">${item.icon || '🌐'}</span>`;
+                if (item.icon && item.icon.startsWith('fa-')) iconHTML = `<i class="fa-brands ${item.icon} text-xl text-cyan-400"></i>`;
 
                 card.innerHTML = `
                     <div>
-                        <div class="flex items-start justify-between gap-3 mb-3">
-                            <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">${iconHTML}</div>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="toggleFavorite('${item.id}')" class="vr-btn p-2 rounded-xl bg-white/5 border border-white/10 ${isFavorite ? 'text-amber-400' : 'text-slate-500'}"><i class="${isFavorite ? 'fa-solid' : 'fa-regular'} fa-star text-sm"></i></button>
-                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300">${escapeHTML(item.category)}</span>
+                        <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center shrink-0">${iconHTML}</div>
+                            <div class="flex items-center gap-1">
+                                <button onclick="toggleFavorite('${item.id}')" class="vr-btn p-1.5 rounded-lg bg-white/5 border border-white/10 ${isFavorite ? 'text-amber-400' : 'text-slate-500'}"><i class="${isFavorite ? 'fa-solid' : 'fa-regular'} fa-star text-xs"></i></button>
+                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 truncate max-w-[80px]">${escapeHTML(item.category)}</span>
                             </div>
                         </div>
-                        <h3 class="text-base font-bold text-white mb-1.5 line-clamp-1">${escapeHTML(item.title)}</h3>
-                        <p class="text-slate-400 text-xs leading-relaxed line-clamp-2 mb-4">${escapeHTML(item.description || '')}</p>
+                        <h3 class="text-sm font-bold text-white mb-1 line-clamp-2 leading-snug min-h-[2.5rem]" title="${escapeHTML(item.title)}">${escapeHTML(item.title)}</h3>
+                        <p class="text-slate-400 text-[11px] leading-relaxed line-clamp-2 mb-3">${escapeHTML(item.description || '')}</p>
                     </div>
-                    <div class="flex items-center gap-2 pt-3 border-t border-white/5">
-                        <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer" class="vr-btn flex-1 bg-cyan-500/20 text-cyan-300 font-bold py-2.5 px-4 rounded-xl text-center text-xs border border-cyan-500/30">Ouvrir en VR</a>
+                    <div class="flex items-center gap-2 pt-2 border-t border-white/5">
+                        <a href="${escapeHTML(item.url)}" target="_blank" rel="noopener noreferrer" class="vr-btn flex-1 bg-cyan-500/20 text-cyan-300 font-bold py-2 px-3 rounded-lg text-center text-[11px] border border-cyan-500/30">Ouvrir en VR</a>
                     </div>
                 `;
                 bookmarkGrid.appendChild(card);
@@ -278,7 +286,18 @@
 
         function setupEventListeners() {
             searchInput.addEventListener('input', (e) => { searchQuery = e.target.value.trim(); renderBookmarks(); });
-            document.getElementById('btnToggleFavoritesOnly').addEventListener('click', () => { showFavoritesOnly = !showFavoritesOnly; renderBookmarks(); });
+            document.getElementById('btnToggleFavoritesOnly').addEventListener('click', () => { 
+                showFavoritesOnly = !showFavoritesOnly; 
+                const btn = document.getElementById('btnToggleFavoritesOnly');
+                if (showFavoritesOnly) {
+                    btn.classList.add('bg-amber-500/20', 'border-amber-400/40', 'text-amber-300');
+                    btn.classList.remove('bg-white/5', 'border-white/10', 'text-slate-200');
+                } else {
+                    btn.classList.remove('bg-amber-500/20', 'border-amber-400/40', 'text-amber-300');
+                    btn.classList.add('bg-white/5', 'border-white/10', 'text-slate-200');
+                }
+                renderBookmarks(); 
+            });
         }
 
         function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
