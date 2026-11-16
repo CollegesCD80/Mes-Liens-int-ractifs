@@ -68,7 +68,7 @@
 
     <!-- HEADER ADMIN -->
     <header class="sticky top-0 z-40 glass-panel border-b border-white/10 px-4 lg:px-8 py-3.5 mb-6">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="max-w-[95rem] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-600 to-red-600 flex items-center justify-center shadow-lg text-white text-2xl font-black">
                     <i class="fa-solid fa-user-shield"></i>
@@ -86,8 +86,9 @@
                     <i class="fa-solid fa-plus"></i>
                     <span>Ajouter un lien</span>
                 </button>
-                <button id="btnOpenSettings" class="vr-btn bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3 py-2.5 rounded-xl text-sm font-medium" title="Paramètres">
-                    <i class="fa-solid fa-gear"></i>
+                <button id="btnOpenCategoryModal" class="vr-btn bg-white/10 hover:bg-white/20 border border-white/20 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium">
+                    <i class="fa-solid fa-folder-plus text-amber-400"></i>
+                    <span>Ajouter une catégorie</span>
                 </button>
                 <button id="btnLogout" class="vr-btn bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 px-3.5 py-2.5 rounded-xl font-semibold text-sm" title="Déconnexion">
                     <i class="fa-solid fa-power-off"></i>
@@ -97,7 +98,7 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main id="mainContent" class="max-w-7xl mx-auto px-4 lg:px-8 flex-1 w-full hidden">
+    <main id="mainContent" class="max-w-[95rem] mx-auto px-4 lg:px-8 flex-1 w-full hidden">
         <section class="glass-panel rounded-3xl p-6 mb-8 border border-amber-500/30">
             <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
@@ -115,9 +116,14 @@
             </div>
         </section>
 
-        <!-- BOOKMARKS GRID -->
+        <!-- BARRE HORIZONTALE DES CATÉGORIES -->
+        <section class="mb-8 overflow-x-auto pb-2">
+            <div class="flex items-center gap-2 min-w-max" id="categoryFilterContainer"></div>
+        </section>
+
+        <!-- BOOKMARKS GRID (8 par ligne sur grands écrans) -->
         <section>
-            <div id="bookmarkGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+            <div id="bookmarkGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-8 gap-4"></div>
         </section>
     </main>
 
@@ -190,23 +196,24 @@
         </div>
     </div>
 
-    <!-- MODAL PARAMÈTRES -->
-    <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
+    <!-- MODAL AJOUT CATÉGORIE -->
+    <div id="categoryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 border border-white/20 shadow-2xl relative">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-amber-400"></i>
-                    <span>Paramètres Enseignant</span>
+                    <i class="fa-solid fa-folder-plus text-amber-400"></i>
+                    <span>Ajouter une catégorie</span>
                 </h3>
-                <button class="closeSettingsModal vr-btn text-slate-400 hover:text-white p-2 text-lg"><i class="fa-solid fa-xmark"></i></button>
+                <button class="closeCategoryModal vr-btn text-slate-400 hover:text-white p-2 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="space-y-5">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Ajouter une Matière</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="newCategoryInput" placeholder="Ex: Géographie..." class="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-white text-sm">
-                        <button id="btnAddCategory" class="vr-btn px-4 py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-sm">Créer</button>
-                    </div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Nom de la matière</label>
+                    <input type="text" id="newCategoryInput" placeholder="Ex: Géographie..." class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white text-sm focus:outline-none focus:border-amber-400">
+                </div>
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" class="closeCategoryModal vr-btn px-5 py-2.5 rounded-xl bg-white/5 text-slate-300 text-sm">Annuler</button>
+                    <button type="button" id="btnAddCategory" class="vr-btn px-6 py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-sm">Créer la catégorie</button>
                 </div>
             </div>
         </div>
@@ -225,6 +232,7 @@
         let bookmarks = [];
         let masterKey = "";
         let draggedIndex = null;
+        let currentCategory = 'Toutes';
 
         const authModal = document.getElementById('authModal');
         const authForm = document.getElementById('authForm');
@@ -233,7 +241,8 @@
         const adminControls = document.getElementById('adminControls');
         const bookmarkGrid = document.getElementById('bookmarkGrid');
         const bookmarkModal = document.getElementById('bookmarkModal');
-        const settingsModal = document.getElementById('settingsModal');
+        const categoryModal = document.getElementById('categoryModal');
+        const categoryFilterContainer = document.getElementById('categoryFilterContainer');
         const bookmarkForm = document.getElementById('bookmarkForm');
         const inputId = document.getElementById('bookmarkId');
         const inputTitle = document.getElementById('inputTitle');
@@ -248,7 +257,6 @@
             setupEventListeners();
         });
 
-        // CONNEXION DIRECTE PAR TEST DE LA CLÉ API
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const key = inputMasterKey.value.trim();
@@ -281,8 +289,9 @@
                 });
                 if (response.ok) {
                     const json = await response.json();
-                    categories = json.record.categories || [];
+                    categories = json.record.categories || ['Toutes'];
                     bookmarks = json.record.bookmarks || [];
+                    renderCategories();
                     renderCategoriesSelect();
                     renderBookmarks();
                     showToast('Connexion et chargement réussis !');
@@ -308,14 +317,37 @@
                     body: JSON.stringify({ categories, bookmarks })
                 });
 
-                if (response.ok) showToast('Ordre et modifications enregistrés sur le Cloud !');
+                if (response.ok) showToast('Modifications enregistrées sur le Cloud !');
                 else showToast('Erreur lors de la sauvegarde Cloud', true);
             } catch (e) { showToast('Erreur réseau Cloud', true); }
         }
 
+        function renderCategories() {
+            categoryFilterContainer.innerHTML = '';
+            
+            if (!categories.includes('Toutes')) categories.unshift('Toutes');
+            const otherCategories = categories.filter(c => c !== 'Toutes').sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+            const sortedCategories = ['Toutes', ...otherCategories];
+
+            sortedCategories.forEach(cat => {
+                const btn = document.createElement('button');
+                const isActive = (cat === currentCategory);
+                btn.className = `vr-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all border ${isActive ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 border-amber-300/40 font-black shadow-lg' : 'bg-white/5 text-slate-300 border-white/10'}`;
+                btn.innerHTML = `<span>${cat}</span>`;
+                btn.addEventListener('click', () => {
+                    currentCategory = cat;
+                    renderCategories();
+                    renderBookmarks();
+                });
+                categoryFilterContainer.appendChild(btn);
+            });
+        }
+
         function renderCategoriesSelect() {
             inputCategory.innerHTML = '';
-            categories.filter(c => c !== 'Toutes').forEach(cat => {
+            const sortedCategories = categories.filter(c => c !== 'Toutes').sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
+            
+            sortedCategories.forEach(cat => {
                 const opt = document.createElement('option');
                 opt.value = cat; opt.textContent = cat;
                 inputCategory.appendChild(opt);
@@ -324,13 +356,20 @@
 
         function renderBookmarks() {
             bookmarkGrid.innerHTML = '';
-            bookmarks.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = 'glass-card rounded-3xl p-5 flex flex-col justify-between relative';
-                card.setAttribute('draggable', 'true');
-                card.dataset.index = index;
+            
+            const filtered = bookmarks.filter(item => {
+                if (currentCategory === 'Toutes') return true;
+                return item.category === currentCategory;
+            });
 
-                // Événements de Drag and Drop
+            filtered.forEach((item) => {
+                const realIndex = bookmarks.findIndex(b => b.id === item.id);
+                
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-3xl p-4 flex flex-col justify-between relative';
+                card.setAttribute('draggable', 'true');
+                card.dataset.index = realIndex;
+
                 card.addEventListener('dragstart', handleDragStart);
                 card.addEventListener('dragover', handleDragOver);
                 card.addEventListener('dragenter', handleDragEnter);
@@ -338,28 +377,28 @@
                 card.addEventListener('drop', handleDrop);
                 card.addEventListener('dragend', handleDragEnd);
 
-                let iconHTML = `<span class="text-2xl">${item.icon || '🌐'}</span>`;
-                if (item.icon && item.icon.startsWith('fa-')) iconHTML = `<i class="fa-brands ${item.icon} text-2xl text-amber-400"></i>`;
+                let iconHTML = `<span class="text-xl">${item.icon || '🌐'}</span>`;
+                if (item.icon && item.icon.startsWith('fa-')) iconHTML = `<i class="fa-brands ${item.icon} text-xl text-amber-400"></i>`;
 
                 card.innerHTML = `
                     <div>
-                        <div class="flex items-start justify-between gap-3 mb-3">
-                            <div class="flex items-center gap-2">
-                                <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center">${iconHTML}</div>
-                                <div class="text-slate-500 hover:text-amber-400 cursor-grab p-1" title="Glisser pour réorganiser">
-                                    <i class="fa-solid fa-grip-vertical"></i>
+                        <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">${iconHTML}</div>
+                                <div class="text-slate-500 hover:text-amber-400 cursor-grab p-0.5" title="Glisser pour réorganiser">
+                                    <i class="fa-solid fa-grip-vertical text-xs"></i>
                                 </div>
                             </div>
-                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300">${escapeHTML(item.category)}</span>
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 truncate max-w-[90px]">${escapeHTML(item.category)}</span>
                         </div>
-                        <h3 class="text-base font-bold text-white mb-1.5 line-clamp-1">${escapeHTML(item.title)}</h3>
-                        <p class="text-slate-400 text-xs leading-relaxed line-clamp-2 mb-4">${escapeHTML(item.description || '')}</p>
+                        <h3 class="text-sm font-bold text-white mb-1 line-clamp-2 leading-snug min-h-[2.5rem]" title="${escapeHTML(item.title)}">${escapeHTML(item.title)}</h3>
+                        <p class="text-slate-400 text-[11px] leading-relaxed line-clamp-2 mb-3">${escapeHTML(item.description || '')}</p>
                     </div>
-                    <div class="flex items-center gap-2 pt-3 border-t border-white/5">
-                        <button onclick="editBookmark('${item.id}')" class="vr-btn flex-1 bg-white/5 hover:bg-white/15 text-slate-200 py-2.5 rounded-xl text-xs font-semibold border border-white/10 flex items-center justify-center gap-2">
+                    <div class="flex items-center gap-1.5 pt-2 border-t border-white/5">
+                        <button onclick="editBookmark('${item.id}')" class="vr-btn flex-1 bg-white/5 hover:bg-white/15 text-slate-200 py-2 rounded-lg text-[11px] font-semibold border border-white/10 flex items-center justify-center gap-1">
                             <i class="fa-solid fa-pen text-amber-400"></i> Modifier
                         </button>
-                        <button onclick="deleteBookmark('${item.id}')" class="vr-btn bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2.5 rounded-xl text-xs border border-red-500/20">
+                        <button onclick="deleteBookmark('${item.id}')" class="vr-btn bg-red-500/10 hover:bg-red-500/20 text-red-400 p-2 rounded-lg text-[11px] border border-red-500/20" title="Supprimer">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -400,7 +439,7 @@
                 bookmarks.splice(targetIndex, 0, movedItem);
 
                 renderBookmarks();
-                await saveData();
+                await saveData(); 
             }
             return false;
         }
@@ -417,11 +456,12 @@
                 localStorage.removeItem('quest_edu_master_key');
                 window.location.reload();
             });
+
             document.getElementById('btnOpenAddModal').addEventListener('click', () => openBookmarkModal());
             document.querySelectorAll('.closeBookmarkModal').forEach(btn => btn.addEventListener('click', () => bookmarkModal.classList.add('hidden')));
-            
-            document.getElementById('btnOpenSettings').addEventListener('click', () => settingsModal.classList.remove('hidden'));
-            document.querySelectorAll('.closeSettingsModal').forEach(btn => btn.addEventListener('click', () => settingsModal.classList.add('hidden')));
+
+            document.getElementById('btnOpenCategoryModal').addEventListener('click', () => categoryModal.classList.remove('hidden'));
+            document.querySelectorAll('.closeCategoryModal').forEach(btn => btn.addEventListener('click', () => categoryModal.classList.add('hidden')));
 
             bookmarkForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -434,11 +474,16 @@
 
             document.getElementById('btnAddCategory').addEventListener('click', async () => {
                 const catInput = document.getElementById('newCategoryInput');
-                if (catInput.value.trim() && !categories.includes(catInput.value.trim())) {
-                    categories.push(catInput.value.trim());
+                const val = catInput.value.trim();
+                if (val && !categories.includes(val)) {
+                    categories.push(val);
                     await saveData();
+                    renderCategories();
                     renderCategoriesSelect();
                     catInput.value = '';
+                    categoryModal.classList.add('hidden');
+                } else {
+                    showToast('Veuillez entrer un nom valide ou existant.', true);
                 }
             });
         }
