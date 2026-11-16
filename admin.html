@@ -120,7 +120,7 @@
             <div class="flex items-center gap-2 min-w-max" id="categoryFilterContainer"></div>
         </section>
 
-        <!-- BOOKMARKS GRID (6 par ligne sur grands écrans) -->
+        <!-- BOOKMARKS GRID -->
         <section>
             <div id="bookmarkGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4"></div>
         </section>
@@ -189,13 +189,13 @@
                     </div>
                 </div>
 
-                <!-- Sélecteur d'émojis officiel configuré en français (locale="fr") -->
+                <!-- Sélecteur d'émojis officiel configuré dynamiquement en français -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Icône (Emoji)</label>
                     <input type="text" id="inputIcon" placeholder="🚀" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white mb-2" readonly>
                     
                     <div class="border border-white/10 rounded-2xl overflow-hidden">
-                        <emoji-picker id="emojiPickerElement" locale="fr"></emoji-picker>
+                        <emoji-picker id="emojiPickerElement"></emoji-picker>
                     </div>
                 </div>
 
@@ -222,7 +222,6 @@
                 <button class="closeCategoryModal vr-btn text-slate-400 hover:text-white p-2 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <!-- Formulaire d'ajout -->
             <div class="mb-5">
                 <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Ajouter une nouvelle catégorie</label>
                 <div class="flex gap-2">
@@ -231,7 +230,6 @@
                 </div>
             </div>
 
-            <!-- Liste des catégories existantes -->
             <div>
                 <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Catégories existantes</label>
                 <div id="categoryManageList" class="max-h-60 overflow-y-auto space-y-2 pr-1"></div>
@@ -249,8 +247,16 @@
         <span id="toastMessage" class="text-sm font-medium">Message</span>
     </div>
 
-    <script>
+    <script type="module">
+        import fr from 'https://cdn.jsdelivr.net/npm/emoji-picker-element@1/i18n/fr.js';
+
         const binId = "6adb3157ac6210605a4b8388";
+        const emojiPickerElement = document.getElementById('emojiPickerElement');
+
+        // Injection explicite de la base de données et de la langue française
+        emojiPickerElement.i18n = fr;
+        emojiPickerElement.locale = 'fr';
+        emojiPickerElement.dataSource = 'https://cdn.jsdelivr.net/npm/emoji-picker-element-data@^1/fr/emojibase/data.json';
 
         let categories = [];
         let bookmarks = [];
@@ -275,7 +281,6 @@
         const inputCategory = document.getElementById('inputCategory');
         const inputIcon = document.getElementById('inputIcon');
         const inputDescription = document.getElementById('inputDescription');
-        const emojiPickerElement = document.getElementById('emojiPickerElement');
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedKey = localStorage.getItem('quest_edu_master_key');
@@ -535,12 +540,10 @@
             });
             document.querySelectorAll('.closeCategoryModal').forEach(btn => btn.addEventListener('click', () => categoryModal.classList.add('hidden')));
 
-            // Écouteur d'événement sur le sélecteur d'émojis officiel
             emojiPickerElement.addEventListener('emoji-click', event => {
                 inputIcon.value = event.detail.unicode;
             });
 
-            // Création rapide d'une catégorie depuis la modale de lien
             document.getElementById('btnToggleQuickCat').addEventListener('click', () => {
                 document.getElementById('quickCatContainer').classList.toggle('hidden');
             });
@@ -600,7 +603,7 @@
             } else {
                 document.getElementById('modalTitle').querySelector('span').textContent = 'Ajouter une ressource';
                 bookmarkForm.reset(); inputId.value = '';
-                inputIcon.value = '🚀'; // Valeur par défaut
+                inputIcon.value = '🚀';
             }
             bookmarkModal.classList.remove('hidden');
         }
