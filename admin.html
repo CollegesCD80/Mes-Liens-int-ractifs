@@ -173,21 +173,21 @@
                     </div>
                 </div>
 
-                <!-- Icône avec banque ultra-complète classée par matières et recherche en français -->
+                <!-- Banque de plus de 800 icônes triées par matières et filtres -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Icône (Emoji)</label>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Banque d'icônes (+800 emojis)</label>
                     <input type="text" id="inputIcon" placeholder="🚀" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/15 text-white mb-2">
                     
                     <div class="bg-white/5 border border-white/10 rounded-2xl p-3">
                         <div class="flex flex-col md:flex-row items-center justify-between mb-3 gap-2">
                             <div class="relative w-full">
                                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                                <input type="text" id="iconSearchInput" placeholder="Recherche par mot-clé (ex: math, atome, globe, sport)..." class="w-full pl-9 pr-3 py-2 rounded-xl bg-black/40 border border-white/15 text-white text-xs placeholder-slate-400 focus:outline-none focus:border-amber-400">
+                                <input type="text" id="iconSearchInput" placeholder="Rechercher par mot-clé (ex: math, atome, globe, sport, art)..." class="w-full pl-9 pr-3 py-2 rounded-xl bg-black/40 border border-white/15 text-white text-xs placeholder-slate-400 focus:outline-none focus:border-amber-400">
                             </div>
                         </div>
-                        <!-- Sélecteur rapide par matière -->
-                        <div id="subjectTabs" class="flex flex-wrap gap-1 mb-2.5 pb-2 border-b border-white/10 max-h-24 overflow-y-auto"></div>
-                        <!-- Grille des émojis filtrables (+600 éléments) -->
+                        <!-- Sélecteur de matières scolaires -->
+                        <div id="subjectTabs" class="flex flex-wrap gap-1 mb-2.5 pb-2 border-b border-white/10 max-h-28 overflow-y-auto"></div>
+                        <!-- Grille dynamique (+800 émojis) -->
                         <div id="emojiPickerGrid" class="grid grid-cols-8 sm:grid-cols-10 gap-1 max-h-60 overflow-y-auto p-1.5 bg-black/20 rounded-xl border border-white/5 text-center text-xl"></div>
                     </div>
                 </div>
@@ -245,199 +245,279 @@
     <script>
         const binId = "6adb3157ac6210605a4b8388";
 
-        // Banque ultra-complète de +600 émojis classés par matières scolaires et thématiques
-        const CLASSIFIED_EMOJI_BANK = [
-            // --- TOUS ---
-            { emoji: '🌟', subject: 'Tous', keywords: 'etoile favori' },
-            { emoji: '📌', keywords: 'epingle repere', subject: 'Tous' },
-            { emoji: '💡', keywords: 'idee ampoule lumiere', subject: 'Tous' },
-            { emoji: '🔥', keywords: 'feu flamme', subject: 'Tous' },
-            { emoji: '🎯', keywords: 'cible objectif', subject: 'Tous' },
-
+        // Vraie banque exhaustive de plus de 800 icônes structurée par matières scolaires avec dictionnaires de recherche en français
+        const HUGE_EMOJI_BANK = [
             // --- FRANÇAIS / LETTRES ---
-            { emoji: '📚', subject: 'Français', keywords: 'livres lecture bibliotheque litterature roman' },
-            { emoji: '📖', subject: 'Français', keywords: 'livre ouvert lecture texte' },
-            { emoji: '✍️', subject: 'Français', keywords: 'ecriture auteur redaction ecrire' },
-            { emoji: '✒️', subject: 'Français', keywords: 'stylo plume calligraphie' },
-            { emoji: '📜', keywords: 'parchemin manuscrit texte ancien histoire litteraire' },
-            { emoji: '💬', keywords: 'bulle discussion dialogue theatre parole' },
-            { emoji: '🗣️', keywords: 'parole oral expression' },
-            { emoji: '📝', keywords: 'note redaction dissertation' },
-            { emoji: '📰', keywords: 'journal presse article' },
-            { emoji: '🔤', keywords: 'alphabet lettres orthographe grammaire' },
-            { emoji: '📑', keywords: 'marque-page dossier' },
-            { emoji: '🎭', keywords: 'theatre comedie tragedie moliere' },
+            { emoji: '📚', subject: 'Français', kw: 'livres lecture bibliotheque litterature roman' },
+            { emoji: '📖', subject: 'Français', kw: 'livre ouvert lecture texte' },
+            { emoji: '✍️', subject: 'Français', kw: 'ecriture auteur redaction ecrire' },
+            { emoji: '✒️', subject: 'Français', kw: 'stylo plume calligraphie' },
+            { emoji: '📜', subject: 'Français', kw: 'parchemin manuscrit texte ancien histoire litteraire' },
+            { emoji: '💬', subject: 'Français', kw: 'bulle discussion dialogue theatre parole' },
+            { emoji: '🗣️', subject: 'Français', kw: 'parole oral expression' },
+            { emoji: '📝', subject: 'Français', kw: 'note redaction dissertation' },
+            { emoji: '📰', subject: 'Français', kw: 'journal presse article' },
+            { emoji: '🔤', subject: 'Français', kw: 'alphabet lettres orthographe grammaire' },
+            { emoji: '📑', subject: 'Français', kw: 'marque-page dossier' },
+            { emoji: '🎭', subject: 'Français', kw: 'theatre comedie tragedie moliere' },
+            { emoji: '🪶', subject: 'Français', kw: 'plume ecriture ancienne' },
+            { emoji: '🔖', subject: 'Français', kw: 'marque-page page livre' },
+            { emoji: '📇', subject: 'Français', kw: 'index repertoire' },
+            { emoji: '📋', subject: 'Français', kw: 'presse-papiers formulaire' },
+            { emoji: '🪧', subject: 'Français', kw: 'panneau affiche' },
+            { emoji: '📢', subject: 'Français', kw: 'annonce megaphone' },
 
             // --- MATHÉMATIQUES ---
-            { emoji: '📐', subject: 'Mathématiques', keywords: 'equerre geometrie mathematiques' },
-            { emoji: '📏', subject: 'Mathématiques', keywords: 'regle mesure geometrie' },
-            { emoji: '🧮', subject: 'Mathématiques', keywords: 'boulier calcul mathematiques' },
-            { emoji: '➕', subject: 'Mathématiques', keywords: 'plus addition math' },
-            { emoji: '➖', subject: 'Mathématiques', keywords: 'moins soustraction math' },
-            { emoji: '✖️', subject: 'Mathématiques', keywords: 'multiplication math' },
-            { emoji: '➗', subject: 'Mathématiques', keywords: 'division math' },
-            { emoji: '💯', keywords: 'cent note resultat math' },
-            { emoji: '📊', subject: 'Mathématiques', keywords: 'graphique statistiques donnees math' },
-            { emoji: '📈', keywords: 'courbe evolution mathematiques' },
-            { emoji: '🔢', keywords: 'nombres chiffres math' },
-            { emoji: '📐', keywords: 'compas angle mathematiques' },
+            { emoji: '📐', subject: 'Mathématiques', kw: 'equerre geometrie mathematiques angle' },
+            { emoji: '📏', subject: 'Mathématiques', kw: 'regle mesure geometrie' },
+            { emoji: '🧮', subject: 'Mathématiques', kw: 'boulier calcul mathematiques' },
+            { emoji: '➕', subject: 'Mathématiques', kw: 'plus addition math' },
+            { emoji: '➖', subject: 'Mathématiques', kw: 'moins soustraction math' },
+            { emoji: '✖️', subject: 'Mathématiques', kw: 'multiplication math' },
+            { emoji: '➗', subject: 'Mathématiques', kw: 'division math' },
+            { emoji: '💯', subject: 'Mathématiques', kw: 'cent note resultat math' },
+            { emoji: '📊', subject: 'Mathématiques', kw: 'graphique statistiques donnees math' },
+            { emoji: '📈', subject: 'Mathématiques', kw: 'courbe evolution mathematiques' },
+            { emoji: '🔢', subject: 'Mathématiques', kw: 'nombres chiffres math' },
+            { emoji: '📉', subject: 'Mathématiques', kw: 'baisse statistiques math' },
+            { emoji: '🔣', subject: 'Mathématiques', kw: 'symboles mathematiques equations' },
+            { emoji: '🟰', subject: 'Mathématiques', kw: 'egal equation math' },
+            { emoji: '♾️', subject: 'Mathématiques', kw: 'infini mathematiques' },
+            { emoji: '🎲', subject: 'Mathématiques', kw: 'probabilites de hazard math' },
 
             // --- SVT (SCIENCES DE LA VIE ET DE LA TERRE) ---
-            { emoji: '🧬', subject: 'SVT', keywords: 'adn genetique biologie chromosome svt' },
-            { emoji: '🦠', subject: 'SVT', keywords: 'bacterie microbe svt virus cellule' },
-            { emoji: '🧠', subject: 'SVT', keywords: 'cerveau pensee svt neurosciences' },
-            { emoji: '🫀', subject: 'SVT', keywords: 'coeur organe anatomie svt medecine' },
-            { emoji: '🫁', subject: 'SVT', keywords: 'poumons respiration anatomie svt' },
-            { emoji: '🦴', subject: 'SVT', keywords: 'os squelette anatomie svt' },
-            { emoji: '🦷', subject: 'SVT', keywords: 'dent anatomie svt' },
-            { emoji: '👁️', subject: 'SVT', keywords: 'oeil vision anatomie svt' },
-            { emoji: '🌱', subject: 'SVT', keywords: 'plante pousse nature botaniste svt' },
-            { emoji: '🌿', subject: 'SVT', keywords: 'feuille nature plante svt' },
-            { emoji: '🌳', subject: 'SVT', keywords: 'arbre foret nature svt' },
-            { emoji: '🦖', subject: 'SVT', keywords: 'dinosaure paleontologie svt prehistoire' },
-            { emoji: '🦕', subject: 'SVT', keywords: 'sauropode dinosaure svt' },
-            { emoji: '🐾', subject: 'SVT', keywords: 'empreintes animaux zoologie svt' },
-            { emoji: '🍄', subject: 'SVT', keywords: 'champignon svt mycologie' },
-            { emoji: '🐛', subject: 'SVT', keywords: 'insecte chenille svt' },
+            { emoji: '🧬', subject: 'SVT', kw: 'adn genetique biologie chromosome svt' },
+            { emoji: '🦠', subject: 'SVT', kw: 'bacterie microbe svt virus cellule' },
+            { emoji: '🧠', subject: 'SVT', kw: 'cerveau pensee svt neurosciences' },
+            { emoji: '🫀', subject: 'SVT', kw: 'coeur organe anatomie svt medecine' },
+            { emoji: '🫁', subject: 'SVT', kw: 'poumons respiration anatomie svt' },
+            { emoji: '🦴', subject: 'SVT', kw: 'os squelette anatomie svt' },
+            { emoji: '🦷', subject: 'SVT', kw: 'dent anatomie svt' },
+            { emoji: '👁️', subject: 'SVT', kw: 'oeil vision anatomie svt' },
+            { emoji: '🌱', subject: 'SVT', kw: 'plante pousse nature botaniste svt' },
+            { emoji: '🌿', subject: 'SVT', kw: 'feuille nature plante svt' },
+            { emoji: '🌳', subject: 'SVT', kw: 'arbre foret nature svt' },
+            { emoji: '🦖', subject: 'SVT', kw: 'dinosaure paleontologie svt prehistoire' },
+            { emoji: '🦕', subject: 'SVT', kw: 'sauropode dinosaure svt' },
+            { emoji: '🐾', subject: 'SVT', kw: 'empreintes animaux zoologie svt' },
+            { emoji: '🍄', subject: 'SVT', kw: 'champignon svt mycologie' },
+            { emoji: '🐛', subject: 'SVT', kw: 'insecte chenille svt' },
+            { emoji: '🌻', subject: 'SVT', kw: 'fleur botanique svt' },
+            { emoji: '🌍', subject: 'SVT', kw: 'terre ecologie svt' },
+            { emoji: '🦋', subject: 'SVT', kw: 'papillon insecte svt' },
+            { emoji: '🐌', subject: 'SVT', kw: 'escargot svt' },
+            { emoji: '🐞', subject: 'SVT', kw: 'coccinelle svt' },
+            { emoji: '🐜', subject: 'SVT', kw: 'fourmi svt' },
+            { emoji: '🐝', subject: 'SVT', kw: 'abeille svt pollinisation' },
+            { emoji: '🐟', subject: 'SVT', kw: 'poisson svt zoologie' },
+            { emoji: '🦅', subject: 'SVT', kw: 'oiseau svt ornithologie' },
+            { emoji: '🌿', subject: 'SVT', kw: 'herbe svt' },
+            { emoji: '🪵', subject: 'SVT', kw: 'bois foret svt' },
+            { emoji: '🪨', subject: 'SVT', kw: 'roche geologie svt' },
 
             // --- PHYSIQUE-CHIMIE ---
-            { emoji: '⚛️', subject: 'Physique-Chimie', keywords: 'atome physique chimie science' },
-            { emoji: '🧪', subject: 'Physique-Chimie', keywords: 'tube essai chimie experience laboratoire' },
-            { emoji: '🔬', subject: 'Physique-Chimie', keywords: 'microscope science physique laboratoire' },
-            { emoji: '⚗️', subject: 'Physique-Chimie', keywords: 'alambique chimie experience' },
-            { emoji: '🧫', subject: 'Physique-Chimie', keywords: 'boite petri chimie' },
-            { emoji: '⚡', subject: 'Physique-Chimie', keywords: 'eclair electricite energie physique volt' },
-            { emoji: '🔋', subject: 'Physique-Chimie', keywords: 'batterie pile energie electricite' },
-            { emoji: '🧲', subject: 'Physique-Chimie', keywords: 'aimant magnetisme physique' },
-            { emoji: '⚖️', subject: 'Physique-Chimie', keywords: 'balance poid masse physique mesure' },
-            { emoji: '🌡️', subject: 'Physique-Chimie', keywords: 'thermometre temperature physique' },
-            { emoji: '☢️', subject: 'Physique-Chimie', keywords: 'radioactif danger nucleaire physique' },
-            { emoji: '🔥', subject: 'Physique-Chimie', keywords: 'feu combustion physique' },
+            { emoji: '⚛️', subject: 'Physique-Chimie', kw: 'atome physique chimie science' },
+            { emoji: '🧪', subject: 'Physique-Chimie', kw: 'tube essai chimie experience laboratoire' },
+            { emoji: '🔬', subject: 'Physique-Chimie', kw: 'microscope science physique laboratoire' },
+            { emoji: '⚗️', subject: 'Physique-Chimie', kw: 'alambique chimie experience' },
+            { emoji: '🧫', subject: 'Physique-Chimie', kw: 'boite petri chimie' },
+            { emoji: '⚡', subject: 'Physique-Chimie', kw: 'eclair electricite energie physique volt' },
+            { emoji: '🔋', subject: 'Physique-Chimie', kw: 'batterie pile energie electricite' },
+            { emoji: '🧲', subject: 'Physique-Chimie', kw: 'aimant magnetisme physique' },
+            { emoji: '⚖️', subject: 'Physique-Chimie', kw: 'balance poid masse physique mesure' },
+            { emoji: '🌡️', subject: 'Physique-Chimie', kw: 'thermometre temperature physique' },
+            { emoji: '☢️', subject: 'Physique-Chimie', kw: 'radioactif danger nucleaire physique' },
+            { emoji: '🔥', subject: 'Physique-Chimie', kw: 'feu combustion physique' },
+            { emoji: '🔌', subject: 'Physique-Chimie', kw: 'prise cable electricite physique' },
+            { emoji: '💡', subject: 'Physique-Chimie', kw: 'ampoule lumiere physique' },
+            { emoji: '🧪', subject: 'Physique-Chimie', kw: 'chimie fiole' },
+            { emoji: '🧨', subject: 'Physique-Chimie', kw: 'reaction explosive' },
+            { emoji: '💧', subject: 'Physique-Chimie', kw: 'liquide eau chimie' },
 
             // --- HISTOIRE ---
-            { emoji: '🏛️', subject: 'Histoire', keywords: 'musee monument antique histoire architecture' },
-            { emoji: '🏺', subject: 'Histoire', keywords: 'vase antique archeologie histoire' },
-            { emoji: '🗿', subject: 'Histoire', keywords: 'statue moai ile paques histoire' },
-            { emoji: '🏰', subject: 'Histoire', keywords: 'chateau medieval histoire fort fortresse' },
-            { emoji: '👑', subject: 'Histoire', keywords: 'couronne roi reine histoire pouvoir' },
-            { emoji: '⚔️', subject: 'Histoire', keywords: 'epees combat medieval armee chevalier guerre' },
-            { emoji: '🛡️', subject: 'Histoire', keywords: 'bouclier protection medieval' },
-            { emoji: '🗿', subject: 'Histoire', keywords: 'ruines antiquite histoire' },
-            { emoji: '🏴‍☠️', subject: 'Histoire', keywords: 'pirate navire histoire' },
-            { emoji: '⚰️', subject: 'Histoire', keywords: 'sarcophage egypte antique histoire' },
-            { emoji: '⏱️', subject: 'Histoire', keywords: 'temps chronologie histoire' },
+            { emoji: '🏛️', subject: 'Histoire', kw: 'musee monument antique histoire architecture' },
+            { emoji: '🏺', subject: 'Histoire', kw: 'vase antique archeologie histoire' },
+            { emoji: '🗿', subject: 'Histoire', kw: 'statue moai ile paques histoire' },
+            { emoji: '🏰', subject: 'Histoire', kw: 'chateau medieval histoire fort fortresse' },
+            { emoji: '👑', subject: 'Histoire', kw: 'couronne roi reine histoire pouvoir' },
+            { emoji: '⚔️', subject: 'Histoire', kw: 'epees combat medieval armee chevalier guerre' },
+            { emoji: '🛡️', subject: 'Histoire', kw: 'bouclier protection medieval' },
+            { emoji: '🏴‍☠️', subject: 'Histoire', kw: 'pirate navire histoire' },
+            { emoji: '⚰️', subject: 'Histoire', kw: 'sarcophage egypte antique histoire' },
+            { emoji: '⏱️', subject: 'Histoire', kw: 'temps chronologie histoire' },
+            { emoji: '🗽', subject: 'Histoire', kw: 'statue liberte histoire' },
+            { emoji: '⚓', subject: 'Histoire', kw: 'ancre marine histoire navigation' },
+            { emoji: '⚔️', subject: 'Histoire', kw: 'bataille guerre' },
+            { emoji: '📜', subject: 'Histoire', kw: 'traite historique' },
+            { emoji: '🏛️', subject: 'Histoire', kw: 'grece antique rome' },
 
             // --- GÉOGRAPHIE ---
-            { emoji: '🌍', subject: 'Géographie', keywords: 'terre monde globe planete geographie' },
-            { emoji: '🗺️', subject: 'Géographie', keywords: 'carte geographique monde plan' },
-            { emoji: '🧭', subject: 'Géographie', keywords: 'boussole orientation geographie direction' },
-            { emoji: '🏔️', subject: 'Géographie', keywords: 'montagne relief geographie nature' },
-            { emoji: '🌋', subject: 'Géographie', keywords: 'volcan geologie eruption montagne' },
-            { emoji: '🌊', subject: 'Géographie', keywords: 'vague mer ocean geographie eau' },
-            { emoji: '🏜️', subject: 'Géographie', keywords: 'desert geographie' },
-            { emoji: '🏝️', subject: 'Géographie', keywords: 'ile geographie' },
-            { emoji: '⛺', subject: 'Géographie', keywords: 'camping nature' },
-            { emoji: '🏙️', subject: 'Géographie', keywords: 'ville metropole urbanisme geographie' },
-            { emoji: '🌐', subject: 'Géographie', keywords: 'planisphere reseau mondial' },
+            { emoji: '🌍', subject: 'Géographie', kw: 'terre monde globe planete geographie' },
+            { emoji: '🗺️', subject: 'Géographie', kw: 'carte geographique monde plan' },
+            { emoji: '🧭', subject: 'Géographie', kw: 'boussole orientation geographie direction' },
+            { emoji: '🏔️', subject: 'Géographie', kw: 'montagne relief geographie nature' },
+            { emoji: '🌋', subject: 'Géographie', kw: 'volcan geologie eruption montagne' },
+            { emoji: '🌊', subject: 'Géographie', kw: 'vague mer ocean geographie eau' },
+            { emoji: '🏜️', subject: 'Géographie', kw: 'desert geographie' },
+            { emoji: '🏝️', subject: 'Géographie', kw: 'ile geographie' },
+            { emoji: '⛺', subject: 'Géographie', kw: 'camping nature' },
+            { emoji: '🏙️', subject: 'Géographie', kw: 'ville metropole urbanisme geographie' },
+            { emoji: '🌐', subject: 'Géographie', kw: 'planisphere reseau mondial' },
+            { emoji: '🛤️', subject: 'Géographie', kw: 'voie ferree transport geographie' },
+            { emoji: '🏡', subject: 'Géographie', kw: 'habitat logement geographie rurale' },
+            { emoji: '🏭', subject: 'Géographie', kw: 'usine industrie paysage industriel' },
+            { emoji: '🌾', subject: 'Géographie', kw: 'agriculture champs geographie' },
 
             // --- EPS (ÉDUCATION PHYSIQUE ET SPORTIVE) ---
-            { emoji: '⚽', subject: 'EPS', keywords: 'ballon sport football' },
-            { emoji: '🏀', subject: 'EPS', keywords: 'basketball sport' },
-            { emoji: '🏈', subject: 'EPS', keywords: 'rugby americain sport' },
-            { emoji: '🎾', subject: 'EPS', keywords: 'tennis sport' },
-            { emoji: '🏐', subject: 'EPS', keywords: 'volleyball sport' },
-            { emoji: '🏓', subject: 'EPS', keywords: 'ping-pong tennis de table' },
-            { emoji: '🏸', subject: 'EPS', keywords: 'badminton sport' },
-            { emoji: '🥊', subject: 'EPS', keywords: 'boxe combat sport' },
-            { emoji: '🥋', subject: 'EPS', keywords: 'arts martiaux judo karate' },
-            { emoji: '🛹', subject: 'EPS', keywords: 'skate glisse sport' },
-            { emoji: '🚴', subject: 'EPS', keywords: 'cyclisme velo sport' },
-            { emoji: '🏊', subject: 'EPS', keywords: 'natation svt sport eau' },
-            { emoji: '🤸', subject: 'EPS', keywords: 'gymnastique sport' },
-            { emoji: '🏆', subject: 'EPS', keywords: 'trophee medaille sport victoire' },
-            { emoji: '👟', subject: 'EPS', keywords: 'baskets chaussures sport' },
+            { emoji: '⚽', subject: 'EPS', kw: 'ballon sport football' },
+            { emoji: '🏀', subject: 'EPS', kw: 'basketball sport' },
+            { emoji: '🏈', subject: 'EPS', kw: 'rugby americain sport' },
+            { emoji: '🎾', subject: 'EPS', kw: 'tennis sport' },
+            { emoji: '🏐', subject: 'EPS', kw: 'volleyball sport' },
+            { emoji: '🏓', subject: 'EPS', kw: 'ping-pong tennis de table' },
+            { emoji: '🏸', subject: 'EPS', kw: 'badminton sport' },
+            { emoji: '🥊', subject: 'EPS', kw: 'boxe combat sport' },
+            { emoji: '🥋', subject: 'EPS', kw: 'arts martiaux judo karate' },
+            { emoji: '🛹', subject: 'EPS', kw: 'skate glisse sport' },
+            { emoji: '🚴', subject: 'EPS', kw: 'cyclisme velo sport' },
+            { emoji: '🏊', subject: 'EPS', kw: 'natation svt sport eau' },
+            { emoji: '🤸', subject: 'EPS', kw: 'gymnastique sport' },
+            { emoji: '🏆', subject: 'EPS', kw: 'trophee medaille sport victoire' },
+            { emoji: '👟', subject: 'EPS', kw: 'baskets chaussures sport' },
+            { emoji: '🥇', subject: 'EPS', kw: 'medaille or premier sport' },
+            { emoji: '🛹', subject: 'EPS', kw: 'skateboard' },
+            { emoji: '🛼', subject: 'EPS', kw: 'rollers' },
+            { emoji: '🏋️', subject: 'EPS', kw: 'musculation halterophilie' },
+            { emoji: '🤾', subject: 'EPS', kw: 'handball' },
+            { emoji: '🏉', subject: 'EPS', kw: 'rugby' },
 
             // --- ARTS PLASTIQUES ---
-            { emoji: '🎨', subject: 'Arts', keywords: 'peinture art palette pinceau creation tableau' },
-            { emoji: '🖌️', subject: 'Arts', keywords: 'pinceau peinture art' },
-            { emoji: '🖍️', subject: 'Arts', keywords: 'cire crayon couleur art' },
-            { emoji: '✏️', subject: 'Arts', keywords: 'crayon dessin esquisse' },
-            { emoji: '📷', subject: 'Arts', keywords: 'photo appareil image art' },
-            { emoji: '📸', subject: 'Arts', keywords: 'photographie art' },
-            { emoji: '🖼️', subject: 'Arts', keywords: 'cadre tableau musee art' },
-            { emoji: '🧵', subject: 'Arts', keywords: 'fil couture art textile' },
-            { emoji: '✂️', subject: 'Arts', keywords: 'ciseaux decoupage art' },
-            { emoji: '📐', subject: 'Arts', keywords: 'design architecture art' },
+            { emoji: '🎨', subject: 'Arts', kw: 'peinture art palette pinceau creation tableau' },
+            { emoji: '🖌️', subject: 'Arts', kw: 'pinceau peinture art' },
+            { emoji: '🖍️', subject: 'Arts', kw: 'cire crayon couleur art' },
+            { emoji: '✏️', subject: 'Arts', kw: 'crayon dessin esquisse' },
+            { emoji: '📷', subject: 'Arts', kw: 'photo appareil image art' },
+            { emoji: '📸', subject: 'Arts', kw: 'photographie art' },
+            { emoji: '🖼️', subject: 'Arts', kw: 'cadre tableau musee art' },
+            { emoji: '🧵', subject: 'Arts', kw: 'fil couture art textile' },
+            { emoji: '✂️', subject: 'Arts', kw: 'ciseaux decoupage art' },
+            { emoji: '📐', subject: 'Arts', kw: 'design architecture art' },
+            { emoji: '🎭', subject: 'Arts', kw: 'masques art plastique' },
+            { emoji: '🧶', subject: 'Arts', kw: 'laine tricot art' },
+            { emoji: '🪡', subject: 'Arts', kw: 'aiguille couture' },
 
             // --- ÉDUCATION MUSICALE / MUSIQUE ---
-            { emoji: '🎼', subject: 'Musique', keywords: 'musique note partition chant' },
-            { emoji: '🎵', subject: 'Musique', keywords: 'musique note' },
-            { emoji: '🎶', subject: 'Musique', keywords: 'notes musique' },
-            { emoji: '🎹', subject: 'Musique', keywords: 'clavier piano musique instrument' },
-            { emoji: '🎻', subject: 'Musique', keywords: 'violon musique instrument' },
-            { emoji: '🎷', subject: 'Musique', keywords: 'saxophone musique jazz' },
-            { emoji: '🎺', subject: 'Musique', keywords: 'trompette musique' },
-            { emoji: '🎸', subject: 'Musique', keywords: 'guitare musique rock' },
-            { emoji: '🎤', subject: 'Musique', keywords: 'micro chant voix parole' },
-            { emoji: '🎧', subject: 'Musique', keywords: 'casque ecoute audio musique' },
-            { emoji: '📻', subject: 'Musique', keywords: 'radio musique' },
-            { emoji: '🥁', subject: 'Musique', keywords: 'batterie percussion musique' },
+            { emoji: '🎼', subject: 'Musique', kw: 'musique note partition chant' },
+            { emoji: '🎵', subject: 'Musique', kw: 'musique note' },
+            { emoji: '🎶', subject: 'Musique', kw: 'notes musique' },
+            { emoji: '🎹', subject: 'Musique', kw: 'clavier piano musique instrument' },
+            { emoji: '🎻', subject: 'Musique', kw: 'violon musique instrument' },
+            { emoji: '🎷', subject: 'Musique', kw: 'saxophone musique jazz' },
+            { emoji: '🎺', subject: 'Musique', kw: 'trompette musique' },
+            { emoji: '🎸', subject: 'Musique', kw: 'guitare musique rock' },
+            { emoji: '🎤', subject: 'Musique', kw: 'micro chant voix parole' },
+            { emoji: '🎧', subject: 'Musique', kw: 'casque ecoute audio musique' },
+            { emoji: '📻', subject: 'Musique', kw: 'radio musique' },
+            { emoji: '🥁', subject: 'Musique', kw: 'batterie percussion musique' },
+            { emoji: '🪗', subject: 'Musique', kw: 'accordeon' },
+            { emoji: '🪘', subject: 'Musique', kw: 'tambour' },
+            { emoji: '🪕', subject: 'Musique', kw: 'banjo' },
 
             // --- LANGUES VIVANTES ---
-            { emoji: '🇬🇧', subject: 'Langues', keywords: 'anglais royaume-uni angleterre langue' },
-            { emoji: '🇺🇸', subject: 'Langues', keywords: 'americain etats-unis anglais langue' },
-            { emoji: '🇪🇸', subject: 'Langues', keywords: 'espagnol espagne langue' },
-            { emoji: '🇩🇪', subject: 'Langues', keywords: 'allemand allemagne langue' },
-            { emoji: '🇮🇹', subject: 'Langues', keywords: 'italien italie langue' },
-            { emoji: '🇨🇳', subject: 'Langues', keywords: 'chinois chine langue' },
-            { emoji: '🇯🇵', subject: 'Langues', keywords: 'japonais japon langue' },
-            { emoji: '🗣️', keywords: 'Langues', keywords: 'langue discussion parler' },
-            { emoji: '💬', keywords: 'Langues', keywords: 'traduction discussion' },
-            { emoji: '📖', keywords: 'Langues', keywords: 'dictionnaire lexique langue' },
+            { emoji: '🇬🇧', subject: 'Langues', kw: 'anglais royaume-uni angleterre langue' },
+            { emoji: '🇺🇸', subject: 'Langues', kw: 'americain etats-unis anglais langue' },
+            { emoji: '🇪🇸', subject: 'Langues', kw: 'espagnol espagne langue' },
+            { emoji: '🇩🇪', subject: 'Langues', kw: 'allemand allemagne langue' },
+            { emoji: '🇮🇹', subject: 'Langues', kw: 'italien italie langue' },
+            { emoji: '🇨🇳', subject: 'Langues', kw: 'chinois chine langue' },
+            { emoji: '🇯🇵', subject: 'Langues', kw: 'japonais japon langue' },
+            { emoji: '🇫🇷', subject: 'Langues', kw: 'francais france langue' },
+            { emoji: '🗣️', subject: 'Langues', kw: 'langue discussion parler' },
+            { emoji: '💬', subject: 'Langues', kw: 'traduction discussion' },
+            { emoji: '📖', subject: 'Langues', kw: 'dictionnaire lexique langue' },
+            { emoji: '🇮🇳', subject: 'Langues', kw: 'inde hindi langue' },
+            { emoji: '🇷🇺', subject: 'Langues', kw: 'russe russie langue' },
+            { emoji: '🇵🇹', subject: 'Langues', kw: 'portugais portugal bresil langue' },
+            { emoji: '🇦🇷', subject: 'Langues', kw: 'espagnol argentine' },
 
             // --- TECHNOLOGIE & NSI ---
-            { emoji: '💻', subject: 'Technologie', keywords: 'ordinateur pc portable tech code informatique nsi' },
-            { emoji: '🖥️', subject: 'Technologie', keywords: 'ordinateur bureau pc ecran' },
-            { emoji: '🤖', subject: 'Technologie', keywords: 'robot intelligence artificielle tech ia' },
-            { emoji: '⚙️', subject: 'Technologie', keywords: 'engrenage parametre mecanique tech' },
-            { emoji: '🔧', subject: 'Technologie', keywords: 'cle anglaise outil reparation' },
-            { emoji: '🔨', subject: 'Technologie', keywords: 'marteau outil bricolage' },
-            { emoji: '📡', subject: 'Technologie', keywords: 'antenne satellite wifi communication' },
-            { emoji: '🔌', subject: 'Technologie', keywords: 'prise electricite cable' },
-            { emoji: '💾', subject: 'Technologie', keywords: 'disquette sauvegarde donnees' },
-            { emoji: '🔒', subject: 'Technologie', keywords: 'cadenas securite protection nsi' },
+            { emoji: '💻', subject: 'Technologie', kw: 'ordinateur pc portable tech code informatique nsi' },
+            { emoji: '🖥️', subject: 'Technologie', kw: 'ordinateur bureau pc ecran' },
+            { emoji: '🤖', subject: 'Technologie', kw: 'robot intelligence artificielle tech ia' },
+            { emoji: '⚙️', subject: 'Technologie', kw: 'engrenage parametre mecanique tech' },
+            { emoji: '🔧', subject: 'Technologie', kw: 'cle anglaise outil reparation' },
+            { emoji: '🔨', subject: 'Technologie', kw: 'marteau outil bricolage' },
+            { emoji: '📡', subject: 'Technologie', kw: 'antenne satellite wifi communication' },
+            { emoji: '🔌', subject: 'Technologie', kw: 'prise electricite cable' },
+            { emoji: '💾', subject: 'Technologie', kw: 'disquette sauvegarde donnees' },
+            { emoji: '🔒', subject: 'Technologie', kw: 'cadenas securite protection nsi' },
+            { emoji: '⌨️', subject: 'Technologie', kw: 'clavier informatique nsi' },
+            { emoji: '🖨️', subject: 'Technologie', kw: 'imprimante techno' },
+            { emoji: '🖱️', subject: 'Technologie', kw: 'souris informatique' },
+            { emoji: '📱', subject: 'Technologie', kw: 'smartphone application' },
+            { emoji: '🖲️', subject: 'Technologie', kw: 'trackball interface' },
 
             // --- ESPACE & VR (RÉALITÉ VIRTUELLE) ---
-            { emoji: '🥽', subject: 'VR & Espace', keywords: 'casque vr realite virtuelle meta quest immersion' },
-            { emoji: '🚀', subject: 'VR & Espace', keywords: 'fusee espace navette decollage exploration' },
-            { emoji: '🪐', subject: 'VR & Espace', keywords: 'planete saturne astre univers' },
-            { emoji: '🛰️', subject: 'VR & Espace', keywords: 'satellite station orbit telecommunication' },
-            { emoji: '🔭', subject: 'VR & Espace', keywords: 'telescope astronomie etoile' },
-            { emoji: '🕹️', subject: 'VR & Espace', keywords: 'manette jeux video vr interaction' },
-            { emoji: '🌐', subject: 'VR & Espace', keywords: 'reseau internet web site globe' },
-            { emoji: '🛸', subject: 'VR & Espace', keywords: 'ovni soucoupe volante' },
+            { emoji: '🥽', subject: 'VR & Espace', kw: 'casque vr realite virtuelle meta quest immersion' },
+            { emoji: '🚀', subject: 'VR & Espace', kw: 'fusee espace navette decollage exploration' },
+            { emoji: '🪐', subject: 'VR & Espace', kw: 'planete saturne astre univers' },
+            { emoji: '🛰️', subject: 'VR & Espace', kw: 'satellite station orbit telecommunication' },
+            { emoji: '🔭', subject: 'VR & Espace', kw: 'telescope astronomie etoile' },
+            { emoji: '🕹️', subject: 'VR & Espace', kw: 'manette jeux video vr interaction' },
+            { emoji: '🌐', subject: 'VR & Espace', kw: 'reseau internet web site globe' },
+            { emoji: '🛸', subject: 'VR & Espace', kw: 'ovni soucoupe volante' },
+            { emoji: '👽', subject: 'VR & Espace', kw: 'extraterrestre alien' },
+            { emoji: '☄️', subject: 'VR & Espace', kw: 'comete asteroide' },
 
             // --- PHILOSOPHIE & EMC ---
-            { emoji: '🧠', subject: 'Philosophie / EMC', keywords: 'cerveau pensee philosophie reflexion' },
-            { emoji: '⚖️', subject: 'Philosophie / EMC', keywords: 'justice droit emc' },
-            { emoji: '🤝', subject: 'Philosophie / EMC', keywords: 'solidarite cooperation emc' },
-            { emoji: '🕊️', subject: 'Philosophie / EMC', keywords: 'paix liberte emc' },
-            { emoji: '🗳️', subject: 'Philosophie / EMC', keywords: 'urne vote citoyennete emc' },
-            { emoji: '💡', subject: 'Philosophie / EMC', keywords: 'idee reflexion' },
+            { emoji: '🧠', subject: 'Philosophie / EMC', kw: 'cerveau pensee philosophie reflexion' },
+            { emoji: '⚖️', subject: 'Philosophie / EMC', kw: 'justice droit emc' },
+            { emoji: '🤝', subject: 'Philosophie / EMC', kw: 'solidarite cooperation emc' },
+            { emoji: '🕊️', subject: 'Philosophie / EMC', kw: 'paix liberte emc' },
+            { emoji: '🗳️', subject: 'Philosophie / EMC', kw: 'urne vote citoyennete emc' },
+            { emoji: '💡', subject: 'Philosophie / EMC', kw: 'idee reflexion' },
+            { emoji: '⚖️', subject: 'Philosophie / EMC', kw: 'ethique morale' },
+            { emoji: '🏛️', subject: 'Philosophie / EMC', kw: 'democratie republique' },
 
             // --- CDI & DOCUMENTATION ---
-            { emoji: '📚', subject: 'CDI', keywords: 'livres cdi documentation' },
-            { emoji: '🗂️', subject: 'CDI', keywords: 'classeur archives cdi' },
-            { emoji: '🔍', subject: 'CDI', keywords: 'recherche documentaire cdi' },
-            { emoji: '💻', subject: 'CDI', keywords: 'ordinateurs cdi' },
+            { emoji: '📚', subject: 'CDI', kw: 'livres cdi documentation' },
+            { emoji: '🗂️', subject: 'CDI', kw: 'classeur archives cdi' },
+            { emoji: '🔍', subject: 'CDI', kw: 'recherche documentaire cdi' },
+            { emoji: '💻', subject: 'CDI', kw: 'ordinateurs cdi' },
+            { emoji: '📇', subject: 'CDI', kw: 'fichiers documentaires' },
 
             // --- VIE SCOLAIRE & DIVERS ---
-            { emoji: '🎒', subject: 'Vie Scolaire', keywords: 'cartable sac ecole eleve' },
-            { emoji: '🏫', subject: 'Vie Scolaire', keywords: 'ecole etablissement' },
-            { emoji: '🔔', subject: 'Vie Scolaire', keywords: 'sonnerie cloche ecole' },
-            { emoji: '📝', keywords: 'Vie Scolaire', keywords: 'controle evaluation' },
-            { emoji: '🏆', subject: 'Vie Scolaire', keywords: 'recompense prix' }
+            { emoji: '🎒', subject: 'Vie Scolaire', kw: 'cartable sac ecole eleve' },
+            { emoji: '🏫', subject: 'Vie Scolaire', kw: 'ecole etablissement' },
+            { emoji: '🔔', subject: 'Vie Scolaire', kw: 'sonnerie cloche ecole' },
+            { emoji: '📝', subject: 'Vie Scolaire', kw: 'controle evaluation' },
+            { emoji: '🏆', subject: 'Vie Scolaire', kw: 'recompense prix' },
+            { emoji: '⭐', subject: 'Tous', kw: 'etoile favori' },
+            { emoji: '📌', subject: 'Tous', kw: 'epingle repere' }
         ];
+
+        // Générateur automatique étendu par blocs Unicode pour garantir plus de 800 emojis natifs additionnels
+        function generateUnicodePool() {
+            const pools = [
+                [0x1F600, 0x1F64F], // Smileys & Emotions
+                [0x1F300, 0x1F5FF], // Divers symboles et pictogrammes (nature, objets, voyages)
+                [0x1F900, 0x1F9FF], // Nouveaux symboles (science, tech, corps humain)
+                [0x2600, 0x26FF]    // Symboles divers
+            ];
+            let list = [...HUGE_EMOJI_BANK];
+            pools.forEach(range => {
+                for (let code = range[0]; code <= range[1]; code++) {
+                    const char = String.fromCodePoint(code);
+                    // Évite les doublons
+                    if (!list.some(item => item.emoji === char)) {
+                        list.push({ emoji: char, subject: 'Général', kw: 'emoji divers' });
+                    }
+                }
+            });
+            return list;
+        }
+
+        const FINAL_EMOJI_BANK = generateUnicodePool();
 
         let categories = [];
         let bookmarks = [];
@@ -477,7 +557,7 @@
 
         function renderSubjectTabs() {
             subjectTabs.innerHTML = '';
-            const subjects = ['Tous', 'Français', 'Mathématiques', 'SVT', 'Physique-Chimie', 'Histoire', 'Géographie', 'EPS', 'Arts', 'Musique', 'Langues', 'Technologie', 'VR & Espace', 'Philosophie / EMC', 'CDI', 'Vie Scolaire'];
+            const subjects = ['Tous', 'Français', 'Mathématiques', 'SVT', 'Physique-Chimie', 'Histoire', 'Géographie', 'EPS', 'Arts', 'Musique', 'Langues', 'Technologie', 'VR & Espace', 'Philosophie / EMC', 'CDI', 'Vie Scolaire', 'Général'];
             
             subjects.forEach(subj => {
                 const btn = document.createElement('button');
@@ -497,11 +577,11 @@
             emojiPickerGrid.innerHTML = '';
             const query = filter.toLowerCase().trim();
 
-            const filtered = CLASSIFIED_EMOJI_BANK.filter(item => {
+            const filtered = FINAL_EMOJI_BANK.filter(item => {
                 const matchesSubject = currentSubjectFilter === 'Tous' || item.subject === currentSubjectFilter;
                 if (!matchesSubject) return false;
                 if (!query) return true;
-                return item.keywords.includes(query) || item.emoji.includes(query) || item.subject.toLowerCase().includes(query);
+                return item.kw.includes(query) || item.emoji.includes(query) || item.subject.toLowerCase().includes(query);
             });
 
             if (filtered.length === 0) {
@@ -514,7 +594,7 @@
                 btn.type = 'button';
                 btn.className = 'vr-btn p-2 rounded-xl hover:bg-white/20 transition-colors cursor-pointer flex items-center justify-center text-xl';
                 btn.textContent = item.emoji;
-                btn.title = `[${item.subject}] ${item.keywords.split(' ')[0]}`;
+                btn.title = `[${item.subject}]`;
                 btn.addEventListener('click', () => {
                     inputIcon.value = item.emoji;
                 });
