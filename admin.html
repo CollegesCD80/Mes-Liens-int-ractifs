@@ -396,12 +396,11 @@
 
             const targetIndex = parseInt(this.dataset.index);
             if (draggedIndex !== null && draggedIndex !== targetIndex) {
-                // Réorganisation du tableau bookmarks
                 const movedItem = bookmarks.splice(draggedIndex, 1)[0];
                 bookmarks.splice(targetIndex, 0, movedItem);
 
                 renderBookmarks();
-                await saveData(); // Sauvegarde automatique du nouvel ordre
+                await saveData();
             }
             return false;
         }
@@ -467,7 +466,7 @@
         function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
 
         function showToast(message, isError = false) {
-            The toast = document.getElementById('toast');
+            const toast = document.getElementById('toast');
             document.getElementById('toastMessage').textContent = message;
             toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3500);
