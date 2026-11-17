@@ -86,10 +86,11 @@
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide text-white flex items-center gap-2">
+                    <h1 class="text-xl font-bold tracking-wide text-white flex items-center gap-2 flex-wrap">
                         Espace <span class="text-amber-400 font-black">Enseignant</span>
+                        <span class="text-xs font-medium text-slate-300 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/10">Collège Jacques Brel - Villers-Bretonneux</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Administration et synchronisation Cloud</p>
+                    <p class="text-xs text-slate-400">Administration des ressources VR</p>
                 </div>
             </div>
 
@@ -106,6 +107,13 @@
                     <i class="fa-solid fa-eye"></i>
                     <span>Aperçu Élèves</span>
                 </a>
+                
+                <!-- Horloge en temps réel -->
+                <div id="liveClock" class="hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 px-3.5 py-2.5 rounded-xl text-amber-400 text-sm font-semibold tracking-wide">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="clockTime">--:--:--</span>
+                </div>
+
                 <button id="btnLogout" class="vr-btn bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 px-3.5 py-2.5 rounded-xl font-semibold text-sm" title="Déconnexion">
                     <i class="fa-solid fa-power-off"></i>
                 </button>
@@ -288,7 +296,19 @@
             const savedKey = localStorage.getItem('quest_edu_master_key');
             if (savedKey) inputMasterKey.value = savedKey;
             setupEventListeners();
+            initClock();
         });
+
+        // Gestion de l'horloge en temps réel
+        function initClock() {
+            const clockTime = document.getElementById('clockTime');
+            function updateClock() {
+                const now = new Date();
+                clockTime.textContent = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
 
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
