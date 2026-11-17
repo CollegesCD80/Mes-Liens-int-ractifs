@@ -232,7 +232,7 @@
             </div>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Catégories existantes</label>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Catégories existantes (Renommer ou Supprimer)</label>
                 <div id="categoryManageList" class="max-h-60 overflow-y-auto space-y-2 pr-1"></div>
             </div>
 
@@ -264,6 +264,7 @@
         let masterKey = "";
         let draggedIndex = null;
         let currentCategory = 'Toutes';
+        let editingCategoryName = null;
 
         const authModal = document.getElementById('authModal');
         const authForm = document.getElementById('authForm');
@@ -411,16 +412,101 @@
 
             sortedCategories.forEach(cat => {
                 const row = document.createElement('div');
-                row.className = 'flex items-center justify-between bg-white/5 border border-white/10 px-3.5 py-2.5 rounded-xl';
-                row.innerHTML = `
-                    <span class="text-sm text-white font-medium">${escapeHTML(cat)}</span>
-                    <button type="button" onclick="deleteCategory('${cat.replace(/'/g, "\\'")}')" class="vr-btn text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 px-2.5 py-1.5 rounded-lg text-xs" title="Supprimer cette catégorie">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                `;
+                row.className = 'flex items-center justify-between gap-2 bg-white/5 border border-white/10 px-3.5 py-2 rounded-xl';
+                
+                if (editingCategoryName === cat) {
+                    // Mode édition du nom de la catégorie
+                    row.innerHTML = `
+                        <input type="text" id="renameCatInput" value="${escapeHTML(cat)}" class="flex-1 px-2.5 py-1 rounded-lg bg-black/40 border border-amber-400 text-white text-sm focus:outline-none">
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button" onclick="confirmRenameCategory('${cat.replace(/'/g, "\\'")}')" class="vr-btn text-emerald-400 hover:text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 px-2.5 py-1.5 rounded-lg text-xs" title="Valider le nouveau nom">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                            <button type="button" onclick="cancelRenameCategory()" class="vr-btn text-slate-400 hover:text-white bg-white/5 hover:bg-white/15 border border-white/10 px-2.5 py-1.5 rounded-lg text-xs" title="Annuler">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // Affichage normal avec boutons Renommer et Supprimer
+                    row.innerHTML = `
+                        <span class="text-sm text-white font-medium truncate">${escapeHTML(cat)}</span>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button" onclick="startRenameCategory('${cat.replace(/'/g, "\\'")}')" class="vr-btn text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 px-2.5 py-1.5 rounded-lg text-xs" title="Renommer cette catégorie">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button type="button" onclick="deleteCategory('${cat.replace(/'/g, "\\'")}')" class="vr-btn text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 px-2.5 py-1.5 rounded-lg text-xs" title="Supprimer cette catégorie">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    `;
+                }
                 categoryManageList.appendChild(row);
             });
+
+            // Focus automatique sur le champ de saisie en cas d'édition
+            if (editingCategoryName) {
+                const input = document.getElementById('renameCatInput');
+                if (input) {
+                    input.focus();
+                    input.select();
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            window.confirmRenameCategory(editingCategoryName);
+                        } else if (e.key === 'Escape') {
+                            window.cancelRenameCategory();
+                        }
+                    });
+                }
+            }
         }
+
+        window.startRenameCategory = function(catName) {
+            editingCategoryName = catName;
+            renderCategoryManageList();
+        };
+
+        window.cancelRenameCategory = function() {
+            editingCategoryName = null;
+            renderCategoryManageList();
+        };
+
+        window.confirmRenameCategory = async function(oldName) {
+            const input = document.getElementById('renameCatInput');
+            if (!input) return;
+            const newName = input.value.trim();
+
+            if (!newName) {
+                showToast('Le nom de la catégorie ne peut pas être vide.', true);
+                return;
+            }
+            if (newName === oldName) {
+                editingCategoryName = null;
+                renderCategoryManageList();
+                return;
+            }
+            if (categories.some(c => c.toLowerCase() === newName.toLowerCase())) {
+                showToast('Une catégorie porte déjà ce nom.', true);
+                return;
+            }
+
+            // 1. Renommer dans la liste des catégories
+            categories = categories.map(c => (c === oldName ? newName : c));
+
+            // 2. Mettre à jour toutes les ressources associées à l'ancienne catégorie
+            bookmarks = bookmarks.map(b => (b.category === oldName ? { ...b, category: newName } : b));
+
+            // 3. Mettre à jour le filtre actif si nécessaire
+            if (currentCategory === oldName) {
+                currentCategory = newName;
+            }
+
+            editingCategoryName = null;
+            await saveData();
+            refreshCategoryViews();
+            renderBookmarks();
+        };
 
         window.deleteCategory = async function(catName) {
             if (confirm(`Supprimer la catégorie "${catName}" ?`)) {
@@ -536,10 +622,14 @@
             document.querySelectorAll('.closeBookmarkModal').forEach(btn => btn.addEventListener('click', () => bookmarkModal.classList.add('hidden')));
 
             document.getElementById('btnOpenCategoryModal').addEventListener('click', () => {
+                editingCategoryName = null;
                 renderCategoryManageList();
                 categoryModal.classList.remove('hidden');
             });
-            document.querySelectorAll('.closeCategoryModal').forEach(btn => btn.addEventListener('click', () => categoryModal.classList.add('hidden')));
+            document.querySelectorAll('.closeCategoryModal').forEach(btn => btn.addEventListener('click', () => {
+                editingCategoryName = null;
+                categoryModal.classList.add('hidden');
+            }));
 
             emojiPickerElement.addEventListener('emoji-click', event => {
                 inputIcon.value = event.detail.unicode;
