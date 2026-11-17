@@ -67,33 +67,22 @@
         .vr-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .vr-btn:active { transform: scale(0.95); }
 
-        /* Style des boutons de catégories sans box-shadow rognée, remplacée par une lueur interne/externe propre */
+        /* Style des boutons de catégories sans aucune ombre */
         .category-btn {
             background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
         }
         .category-btn:hover {
             background: rgba(255, 255, 255, 0.09);
             border-color: rgba(0, 242, 254, 0.5);
         }
         .category-btn.active {
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2) 0%, rgba(79, 172, 254, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15) 0%, rgba(79, 172, 254, 0.15) 100%);
             border-color: rgba(0, 242, 254, 0.8);
             color: #ffffff;
             font-weight: 800;
-        }
-        /* Utilisation d'un halo lumineux en arrière-plan absolu pour éviter la coupure nette du overflow-x */
-        .category-btn.active::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 1.25rem;
-            background: rgba(0, 242, 254, 0.25);
-            filter: blur(8px);
-            z-index: -1;
         }
     </style>
 </head>
@@ -238,7 +227,7 @@
                 btn.innerHTML = `<span>${escapeHTML(cat)}</span>`;
                 btn.addEventListener('click', () => {
                     currentCategory = cat;
-                    renderCategories();        // Les boutons gardent strictement la même taille et position fixe
+                    renderCategories();
                     renderBookmarks();
                 });
                 categoryFilterContainer.appendChild(btn);
