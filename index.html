@@ -67,7 +67,7 @@
         .vr-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .vr-btn:active { transform: scale(0.95); }
 
-        /* Style des boutons de catégories avec marges internes pour éviter que l'ombre soit coupée */
+        /* Utilisation de drop-shadow pour que l'ombre se diffuse librement sans être coupée par le conteneur */
         .category-btn {
             background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(14px);
@@ -77,12 +77,12 @@
         .category-btn:hover {
             background: rgba(255, 255, 255, 0.09);
             border-color: rgba(0, 242, 254, 0.5);
-            box-shadow: 0 8px 25px -5px rgba(0, 242, 254, 0.25);
+            filter: drop-shadow(0 8px 15px rgba(0, 242, 254, 0.3));
         }
         .category-btn.active {
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.15) 0%, rgba(79, 172, 254, 0.15) 100%);
             border-color: rgba(0, 242, 254, 0.6);
-            box-shadow: 0 10px 30px -5px rgba(0, 242, 254, 0.35);
+            filter: drop-shadow(0 4px 20px rgba(0, 242, 254, 0.45));
             color: #ffffff;
             font-weight: 800;
         }
@@ -136,8 +136,8 @@
 
     <!-- MAIN CONTENT -->
     <main class="max-w-[95rem] mx-auto px-4 lg:px-8 flex-1 w-full flex flex-col">
-        <!-- BARRE HORIZONTALE DES CATÉGORIES (Correction du rognage de l'ombre avec py-3 -my-3 px-2 -mx-2) -->
-        <section class="mb-8 overflow-x-auto py-3 -my-3 px-2 -mx-2">
+        <!-- BARRE HORIZONTALE DES CATÉGORIES -->
+        <section class="mb-8 overflow-x-auto pb-2">
             <div class="flex items-center gap-2 min-w-max" id="categoryFilterContainer"></div>
         </section>
 
