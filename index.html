@@ -56,9 +56,8 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            outline: none; /* Supprime l'effet de focus natif navigateur */
+            outline: none;
         }
-        /* Supprimé : focus-within pour éviter que la dernière carte cliquée reste encadrée */
         .glass-card:hover {
             background: rgba(255, 255, 255, 0.09);
             border-color: rgba(0, 242, 254, 0.5);
@@ -68,7 +67,7 @@
         .vr-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .vr-btn:active { transform: scale(0.95); }
 
-        /* Style des boutons de catégories avec l'effet des cartes au survol/actif */
+        /* Style des boutons de catégories avec marges internes pour éviter que l'ombre soit coupée */
         .category-btn {
             background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(14px);
@@ -137,12 +136,12 @@
 
     <!-- MAIN CONTENT -->
     <main class="max-w-[95rem] mx-auto px-4 lg:px-8 flex-1 w-full flex flex-col">
-        <!-- BARRE HORIZONTALE DES CATÉGORIES -->
-        <section class="mb-8 overflow-x-auto pb-2">
+        <!-- BARRE HORIZONTALE DES CATÉGORIES (Correction du rognage de l'ombre avec py-3 -my-3 px-2 -mx-2) -->
+        <section class="mb-8 overflow-x-auto py-3 -my-3 px-2 -mx-2">
             <div class="flex items-center gap-2 min-w-max" id="categoryFilterContainer"></div>
         </section>
 
-        <!-- BOOKMARKS GRID (6 par ligne sur grands écrans, parfaitement centré) -->
+        <!-- BOOKMARKS GRID -->
         <section class="flex-1">
             <div id="bookmarkGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 justify-items-center"></div>
             <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-center glass-panel rounded-3xl mt-4">
@@ -162,7 +161,6 @@
             { id: '2', title: 'Musée du Louvre VR', url: 'https://www.louvre.fr', category: 'Histoire & Musées', icon: '🏛️', description: 'Visites virtuelles immersives des galeries et expositions du musée.' }
         ];
 
-        // CONFIGURATION JSONBIN (Lecture seule publique)
         const binId = "6adb3157ac6210605a4b8388";
         const readOnlyApiKey = "$2a$10$OdIm7EgO7Jnf3IUg8ukCuOIEkffYw7SErKxywlrM88lko/uP7ZtZ2";
 
@@ -227,7 +225,6 @@
             sortedCategories.forEach(cat => {
                 const btn = document.createElement('button');
                 const isActive = (cat === currentCategory);
-                // Utilisation de la classe category-btn avec la gestion de l'état actif
                 btn.className = `vr-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all category-btn ${isActive ? 'active' : 'text-slate-300'}`;
                 btn.innerHTML = `<span>${escapeHTML(cat)}</span>`;
                 btn.addEventListener('click', () => {
